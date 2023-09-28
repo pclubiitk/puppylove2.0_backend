@@ -1,0 +1,16 @@
+# For Windows Dev users, install postgres & use net stop/start postgresql-x64-15
+
+host = localhost
+port = 5432
+password = "password"
+dbName = postgres
+user = postgres
+CfgAdminPass = something
+
+AdminId = may_be_aleatoryfreak
+AdminPass = you_can_just_guess_it
+
+# Make sure both are different
+UserjwtSigningKey = "something"
+HeartjwtSigningKey = "something2"
+domain = localhost
