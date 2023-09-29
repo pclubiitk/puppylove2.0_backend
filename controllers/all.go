@@ -20,10 +20,11 @@ func FetchHearts(c *gin.Context) {
     c.JSON(http.StatusOK, hearts)
 }
 
+/*
 func UserMail(c *gin.Context) {
+    var u models.mailData
+    var user models.User
     id := c.Param("id")
-    u := models.mailData{}
-    user := models.User{}
     record := Db.Model(&user).Where("id = ?", id).First(&u)
     if record.Error != nil {
         if errors.Is(record.Error, gorm.ErrRecordNotFound) {
@@ -54,4 +55,4 @@ func UserMail(c *gin.Context) {
 // 	}
 
 // 	c.JSON(http.StatusOK, hearts)
-// }
+// }*/
