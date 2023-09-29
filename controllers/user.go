@@ -27,7 +27,7 @@ func UserFirstLogin(c *gin.Context) {
 	}
 
 	// See U later ;) ...
-	user := models.User
+	user := models.User{}
 	record := Db.Model(&user).Where("id = ? AND auth_c = ?", info.Id, info.AuthCode).First(&user)
 	if record.Error != nil {
 		if errors.Is(record.Error, gorm.ErrRecordNotFound) {
