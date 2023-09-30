@@ -2,18 +2,18 @@ package router
 
 import (
 	"net/http"
-	
+
 	"github.com/Akhilstaar/me-my_encryption/controllers"
 	"github.com/Akhilstaar/me-my_encryption/db"
 	"github.com/gin-gonic/gin"
 )
 
 func PuppyRoute(r *gin.Engine, db db.PuppyDb) {
-	
+
 	r.GET("/", func(c *gin.Context) {
 		c.JSON(http.StatusAccepted, "Hello from the other side!")
 	})
-	
+
 	// assigning here cuz I'm only inporting controllers here, & considering their size better import them here.
 	controllers.Db = db
 
@@ -26,7 +26,7 @@ func PuppyRoute(r *gin.Engine, db db.PuppyDb) {
 		// users.GET("/fetchreturnhearts", controllers.FetchReturnHearts)
 		users.POST("/sendheart", controllers.SendHeart)
 		users.POST("/claimheart", controllers.HeartClaim)
-		// users.GET("/mail/:id", controllers.UserMail)
+		users.GET("/mail/:id", controllers.UserMail)
 	}
 	late := r.Group("/special")
 	{
@@ -34,7 +34,7 @@ func PuppyRoute(r *gin.Engine, db db.PuppyDb) {
 		late.Use(controllers.AuthenticateUserHeartclaim())
 		late.POST("/returnclaimedheartlate", controllers.ReturnClaimedHeartLate)
 	}
-	
+
 	// Session administration
 	session := r.Group("/session")
 	{
