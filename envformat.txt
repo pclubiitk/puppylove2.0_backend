@@ -14,3 +14,7 @@ AdminPass = you_can_just_guess_it
 UserjwtSigningKey = "something"
 HeartjwtSigningKey = "something2"
 domain = localhost
+
+
+EMAILID="hello@iitk.ac.in"
+EMAILPASS="hello"

@@ -1,9 +1,13 @@
 package controllers
 
 import (
+	"errors"
 	"net/http"
+
+	"github.com/Akhilstaar/me-my_encryption/mail"
 	"github.com/Akhilstaar/me-my_encryption/models"
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 func FetchHearts(c *gin.Context) {
@@ -22,7 +26,7 @@ func FetchHearts(c *gin.Context) {
 
 func UserMail(c *gin.Context) {
     id := c.Param("id")
-    u := models.mailData{}
+    u := models.MailData{}
     user := models.User{}
     record := Db.Model(&user).Where("id = ?", id).First(&u)
     if record.Error != nil {
@@ -34,13 +38,11 @@ func UserMail(c *gin.Context) {
             return
         }
     }
-
-    // need to write code for this SendMail function.
     
-    // if SendMail(u.Name, u.Email, u.AuthC) != nil {
-    //     c.JSON(http.StatusInternalServerError, gin.H{"error": "Something went wrong, Please try again."})
-    //     return
-    // }
+    if mail.SendMail(u.Name, u.Email, u.AuthC) != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Something went wrong, Please try again."})
+        return
+    }
     c.JSON(http.StatusOK, gin.H{"message": "Auth. code sent successfully !!"})
 }
 
