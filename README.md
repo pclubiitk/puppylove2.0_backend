@@ -1,6 +1,12 @@
-# Me-My Encryption
+# Puppylove2.0 Backend
 
-## How to setup for development
+>Run `populate.py` in Stress test to populate your local `PostgreSQL` database with y22 data.
+
+## Me-My Encryption
+
+Encryption used in Puppylove2.0 is explained below.
+
+### How to setup for development
 
 Clone the repo from the github link & use command `go mod tidy` to install all dependencies (make sure you've installed go).
 
@@ -9,6 +15,7 @@ Install(if not already) & Run the postgres server(refer [link](https://www.postg
 Depending on the authentication details you've set up modify the `.env` file(refer envformat.txt) by filling in details of the postgres server.
 
 > Format of the .env file -- Don't forget to disable SSL if not already.
+
 ```
 host = localhost
 port = 5432
