@@ -1,10 +1,10 @@
 import json
 import requests
 
-adminid = input("Enter admin id")
-password = input("Enter admin pass")
+adminid = input("Enter admin id ")
+password = input("Enter admin pass ")
 
-f = open("./y22data.json")
+f = open("./data.json")
 data = json.load(f)
 headers = {
     'Content-Type': 'application/json',
