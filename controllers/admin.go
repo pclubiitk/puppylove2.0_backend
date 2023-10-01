@@ -3,11 +3,12 @@ package controllers
 import (
 	"net/http"
 	"os"
+
 	// "log"
 	"time"
+
 	"github.com/Akhilstaar/me-my_encryption/db"
 	"github.com/Akhilstaar/me-my_encryption/models"
-	"github.com/Akhilstaar/me-my_encryption/utils"
 	"github.com/gin-gonic/gin"
 	// "github.com/gin-gonic/gin/binding"
 )
@@ -21,13 +22,13 @@ func AdminLogin(c *gin.Context) {
 		return
 	}
 
-	if info.Id != os.Getenv("AdminId"){
-		c.JSON(http.StatusForbidden, gin.H{"error" : "This action will be reported."})
+	if info.Id != os.Getenv("AdminId") {
+		c.JSON(http.StatusForbidden, gin.H{"error": "This action will be reported."})
 		return
 	}
 
-	if info.Pass != os.Getenv("AdminPass"){
-		c.JSON(http.StatusForbidden, gin.H{"error" : "Invalid Password."})
+	if info.Pass != os.Getenv("AdminPass") {
+		c.JSON(http.StatusForbidden, gin.H{"error": "Invalid Password."})
 		return
 	}
 
@@ -47,14 +48,13 @@ func AdminLogin(c *gin.Context) {
 		Secure:   false, // Set this to true if you're using HTTPS, false for HTTP
 		SameSite: http.SameSiteStrictMode,
 	}
-	
+
 	http.SetCookie(c.Writer, cookie)
 	c.JSON(http.StatusOK, gin.H{"message": "Admin logged in successfully !!"})
 }
 
 func AddNewUser(c *gin.Context) {
 	// TODO: Modify this function to handle multiple concatenated json inputs
-
 
 	// TODO: Implement admin authentication logic
 	// Authenticate the admin here
@@ -67,7 +67,7 @@ func AddNewUser(c *gin.Context) {
 	}
 
 	// Create user
-	for _,user := range info.TypeUserNew {
+	for _, user := range info.TypeUserNew {
 
 		newUser := models.User{
 			Id:      user.Id,
@@ -77,15 +77,15 @@ func AddNewUser(c *gin.Context) {
 			Pass:    user.PassHash,
 			PrivK:   "",
 			PubK:    "",
-			AuthC:   utils.RandStringRunes(15),
+			AuthC:   "",
 			Data:    "",
 			Submit:  false,
 			Matches: "",
 			Dirty:   false,
 		}
-	
+
 		// Insert the user into the database
-	
+
 		if err := Db.Create(&newUser).Error; err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err})
 			return
