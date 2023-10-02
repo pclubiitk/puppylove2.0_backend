@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/Akhilstaar/me-my_encryption/models"
+	"github.com/pclubiitk/puppylove2.0_backend/models"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
@@ -28,6 +28,12 @@ func UserFirstLogin(c *gin.Context) {
 
 	// See U later ;) ...
 	user := models.User{}
+	publicK := Db.Model(&user).Where("pub_k = ?", info.PubKey).First(&user)
+	if publicK.Error == nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Please enter another public key !!"})
+		return	
+	}
+
 	record := Db.Model(&user).Where("id = ? AND auth_c = ?", info.Id, info.AuthCode).First(&user)
 	if record.Error != nil {
 		if errors.Is(record.Error, gorm.ErrRecordNotFound) {
@@ -43,7 +49,6 @@ func UserFirstLogin(c *gin.Context) {
 	if err := record.Updates(models.User{
 		Id:    info.Id,
 		Pass:  info.PassHash,
-		PrivK: info.PrivKey,
 		PubK:  info.PubKey,
 		AuthC: " ",
 		Data:  info.Data,

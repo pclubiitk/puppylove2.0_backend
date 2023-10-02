@@ -13,7 +13,6 @@ type (
 		Email   string `json:"email" bson:"email" gorm:"unique"`
 		Gender  string `json:"gender" bson:"gender"`
 		Pass    string `json:"passHash" bson:"passHash"`
-		PrivK   string `json:"privKey" bson:"privKey"`
 		PubK    string `json:"pubKey" bson:"pubKey"`
 		AuthC   string `json:"authCode" bson:"authCode"`
 		Data    string `json:"data" bson:"data"`
@@ -40,7 +39,6 @@ type TypeUserFirst struct {
 	AuthCode string `json:"authCode" binding:"required"`
 	PassHash string `json:"passHash" binding:"required"`
 	PubKey   string `json:"pubKey" binding:"required"`
-	PrivKey  string `json:"privKey" binding:"required"`
 	Data     string `json:"data" binding:"required"`
 }
 

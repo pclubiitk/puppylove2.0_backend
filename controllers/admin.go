@@ -6,9 +6,9 @@ import (
 
 	// "log"
 	"time"
-
-	"github.com/Akhilstaar/me-my_encryption/db"
-	"github.com/Akhilstaar/me-my_encryption/models"
+	"github.com/pclubiitk/puppylove2.0_backend/utils"
+	"github.com/pclubiitk/puppylove2.0_backend/db"
+	"github.com/pclubiitk/puppylove2.0_backend/models"
 	"github.com/gin-gonic/gin"
 	// "github.com/gin-gonic/gin/binding"
 )
@@ -75,9 +75,8 @@ func AddNewUser(c *gin.Context) {
 			Email:   user.Email,
 			Gender:  user.Gender,
 			Pass:    user.PassHash,
-			PrivK:   "",
 			PubK:    "",
-			AuthC:   "",
+			AuthC:   utils.RandStringRunes(15),
 			Data:    "",
 			Submit:  false,
 			Matches: "",

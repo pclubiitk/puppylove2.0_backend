@@ -3,8 +3,8 @@ package router
 import (
 	"net/http"
 
-	"github.com/Akhilstaar/me-my_encryption/controllers"
-	"github.com/Akhilstaar/me-my_encryption/db"
+	"github.com/pclubiitk/puppylove2.0_backend/controllers"
+	"github.com/pclubiitk/puppylove2.0_backend/db"
 	"github.com/gin-gonic/gin"
 )
 

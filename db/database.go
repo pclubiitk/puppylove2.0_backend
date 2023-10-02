@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/Akhilstaar/me-my_encryption/models"
+	"github.com/pclubiitk/puppylove2.0_backend/models"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )

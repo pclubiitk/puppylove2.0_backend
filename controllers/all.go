@@ -4,9 +4,9 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/Akhilstaar/me-my_encryption/mail"
-	"github.com/Akhilstaar/me-my_encryption/models"
-	"github.com/Akhilstaar/me-my_encryption/utils"
+	"github.com/pclubiitk/puppylove2.0_backend/mail"
+	"github.com/pclubiitk/puppylove2.0_backend/models"
+	"github.com/pclubiitk/puppylove2.0_backend/utils"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )

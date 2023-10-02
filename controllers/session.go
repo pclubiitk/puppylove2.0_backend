@@ -4,11 +4,10 @@ import (
 	"net/http"
 	"os"
 
-	// "github.com/Akhilstaar/me-my_encryption/models"
 	"errors"
 	"time"
 
-	"github.com/Akhilstaar/me-my_encryption/models"
+	"github.com/pclubiitk/puppylove2.0_backend/models"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"
 	"gorm.io/gorm"
