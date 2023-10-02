@@ -3,13 +3,13 @@ package main
 import (
 	"os"
 
-	"github.com/Akhilstaar/me-my_encryption/db"
-	"github.com/Akhilstaar/me-my_encryption/router"
-	"github.com/Akhilstaar/me-my_encryption/utils"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
+	"github.com/pclubiitk/puppylove2.0_backend/db"
+	"github.com/pclubiitk/puppylove2.0_backend/router"
+	"github.com/pclubiitk/puppylove2.0_backend/utils"
 )
 
 func main() {

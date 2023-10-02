@@ -1,4 +1,4 @@
-module github.com/Akhilstaar/me-my_encryption
+module github.com/pclubiitk/puppylove2.0_backend
 
 go 1.21.0
 
