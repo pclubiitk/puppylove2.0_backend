@@ -3,10 +3,8 @@ package controllers
 import (
 	"net/http"
 	"os"
-
 	"errors"
 	"time"
-
 	"github.com/pclubiitk/puppylove2.0_backend/models"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"

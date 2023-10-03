@@ -2,12 +2,11 @@ package controllers
 
 import (
 	"errors"
-	// "fmt"
 	"net/http"
 	"time"
 
-	"github.com/pclubiitk/puppylove2.0_backend/models"
 	"github.com/gin-gonic/gin"
+	"github.com/pclubiitk/puppylove2.0_backend/models"
 	"gorm.io/gorm"
 )
 
@@ -21,17 +20,34 @@ func UserFirstLogin(c *gin.Context) {
 		return
 	}
 
-	if info.AuthCode == " " {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "User already registered."})
+	tempU := models.MailData{}
+	tempUser := models.User{}
+	tempRecord := Db.Model(&tempUser).Where("id = ?", info.Id).First(&tempU)
+	if tempRecord.Error != nil {
+		if errors.Is(tempRecord.Error, gorm.ErrRecordNotFound) {
+			c.JSON(http.StatusForbidden, gin.H{"error": "User not found !!"})
+			return
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Something went wrong, Please try again."})
+			return
+		}
+	}
+	if tempU.Dirty {
+		c.JSON(http.StatusMethodNotAllowed, gin.H{"error": "User already registered"})
 		return
 	}
+
+	// if info.AuthCode == " " {
+	// 	c.JSON(http.StatusBadRequest, gin.H{"error": "User already registered."})
+	// 	return
+	// }
 
 	// See U later ;) ...
 	user := models.User{}
 	publicK := Db.Model(&user).Where("pub_k = ?", info.PubKey).First(&user)
 	if publicK.Error == nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Please enter another public key !!"})
-		return	
+		return
 	}
 
 	record := Db.Model(&user).Where("id = ? AND auth_c = ?", info.Id, info.AuthCode).First(&user)
