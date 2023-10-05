@@ -57,6 +57,18 @@ class Admin:
             if "error" in response.keys():
                 display('-', f"Error in Admin User Add: {Back.YELLOW}{response['error']}{Back.RESET}")
                 return -1
+    def deleteUsers(self, users):
+        users = [user for user in users if Admin.checkDeleteUserFormat(user)]
+        data = self.session.post(f"{self.url}{Admin.deleteUser_path}", data=json.dumps({"deleteuser": users}), headers=self.headers)
+        response = json.loads(data.text)
+        try:
+            if response["message"] == "User Deleted successfully.":
+                display('+', f"{Back.MAGENTA}{len(users)}{Back.RESET} Users Added")
+                return len(users)
+        except:
+            if "error" in response.keys():
+                display('-', f"Error in Admin User Delete: {Back.YELLOW}{response['error']}{Back.RESET}")
+                return -1
     def deleteAllUsers(self):
         self.session.get(f"{self.url}{Admin.deleteAllUsers_path}", headers=self.headers)
     @staticmethod
@@ -66,6 +78,15 @@ class Admin:
                 return False
             for key in user.keys():
                 if key not in Admin.newUserFields:
+                    return False
+        return True
+    @staticmethod
+    def checkDeleteUserFormat(user):
+        if type(user) == dict:
+            if len(user.keys()) != len(Admin.deleteUserFields):
+                return False
+            for key in user.keys():
+                if key not in Admin.deleteUserFields:
                     return False
         return True
 
