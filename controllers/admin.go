@@ -3,14 +3,11 @@ package controllers
 import (
 	"net/http"
 	"os"
-
-	// "log"
 	"time"
 	"github.com/pclubiitk/puppylove2.0_backend/utils"
 	"github.com/pclubiitk/puppylove2.0_backend/db"
 	"github.com/pclubiitk/puppylove2.0_backend/models"
 	"github.com/gin-gonic/gin"
-	// "github.com/gin-gonic/gin/binding"
 )
 
 var Db db.PuppyDb

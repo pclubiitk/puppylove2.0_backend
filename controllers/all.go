@@ -4,10 +4,10 @@ import (
 	"errors"
 	"net/http"
 
+	"github.com/gin-gonic/gin"
 	"github.com/pclubiitk/puppylove2.0_backend/mail"
 	"github.com/pclubiitk/puppylove2.0_backend/models"
 	"github.com/pclubiitk/puppylove2.0_backend/utils"
-	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
 
@@ -38,6 +38,10 @@ func UserMail(c *gin.Context) {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Something went wrong, Please try again."})
 			return
 		}
+	}
+	if u.Dirty {
+		c.JSON(http.StatusMethodNotAllowed, gin.H{"error": "User already registered"})
+		return
 	}
 	AuthC := utils.RandStringRunes(15)
 	Db.Model(&user).Where("id = ?", id).Update("AuthC", AuthC)

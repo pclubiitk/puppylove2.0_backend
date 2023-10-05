@@ -58,4 +58,5 @@ type MailData struct {
 	Name  string `json:"name" binding:"required"`
 	Email string `json:"email" binding:"required"`
 	AuthC string `json:"authCode" binding:"required"`
+	Dirty bool   `json:"dirty" binding:"required"`
 }
