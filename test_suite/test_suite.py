@@ -45,6 +45,27 @@ class Admin:
         except:
             if "error" in response.keys():
                 display('-', f"Error in Admin LogIn: {Back.YELLOW}{response['error']}{Back.RESET}")
+    def addUsers(self, users):
+        users = [user for user in users if Admin.checkNewUserFormat(user)]
+        data = self.session.post(f"{self.url}{Admin.addNewUser_path}", data=json.dumps({"newuser": users}), headers=self.headers)
+        response = json.loads(data.text)
+        try:
+            if response["message"] == "User created successfully.":
+                display('+', f"{Back.MAGENTA}{len(users)}{Back.RESET} Users Added")
+                return len(users)
+        except:
+            if "error" in response.keys():
+                display('-', f"Error in Admin User Add: {Back.YELLOW}{response['error']}{Back.RESET}")
+                return -1
+    @staticmethod
+    def checkNewUserFormat(user):
+        if type(user) == dict:
+            if len(user.keys()) != len(Admin.newUserFields):
+                return False
+            for key in user.keys():
+                if key not in Admin.newUserFields:
+                    return False
+        return True
 
 if __name__ == "__main__":
     pass
