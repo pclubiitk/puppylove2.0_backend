@@ -57,6 +57,8 @@ class Admin:
             if "error" in response.keys():
                 display('-', f"Error in Admin User Add: {Back.YELLOW}{response['error']}{Back.RESET}")
                 return -1
+    def deleteAllUsers(self):
+        self.session.get(f"{self.url}{Admin.deleteAllUsers_path}", headers=self.headers)
     @staticmethod
     def checkNewUserFormat(user):
         if type(user) == dict:
