@@ -2,7 +2,6 @@ package router
 
 import (
 	"net/http"
-
 	"github.com/pclubiitk/puppylove2.0_backend/controllers"
 	"github.com/pclubiitk/puppylove2.0_backend/db"
 	"github.com/gin-gonic/gin"
