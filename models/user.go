@@ -39,6 +39,7 @@ type TypeUserFirst struct {
 	AuthCode string `json:"authCode" binding:"required"`
 	PassHash string `json:"passHash" binding:"required"`
 	PubKey   string `json:"pubKey" binding:"required"`
+	PrivKey  string `json:"pubKey" binding:"required"`
 	Data     string `json:"data" binding:"required"`
 }
 
