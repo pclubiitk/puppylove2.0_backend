@@ -109,6 +109,40 @@ class Admin:
                 if key not in Admin.deleteUserFields:
                     return False
         return True
+class User:
+    loginFirst_path = "/users/login/first"
+    def __init__(self, id, password, host="127.0.0.1", port=8080):
+        self.session = requests.session()
+        self.host = host
+        self.port = port
+        self.url = f"http://{host}:{port}"
+        self.id = id
+        self.password = password
+        self.data = ''
+        self.public_key_generator = crypto.PKey()
+        self.aes_cipher = AESCipher(self.password)
+        self.headers = {}
+    def loginFirst(self, authCode):
+        self.authCode = authCode
+        self.passHash = hashlib.sha256(self.password).hexdigest()
+        public_key_generator = self.public_key_generator.generate_key(crypto.TYPE_RSA, 2048)
+        self.public_key = crypto.dump_publickey(crypto.FILETYPE_PEM, public_key_generator)
+        self.private_key = crypto.dump_privatekey(crypto.FILETYPE_PEM, public_key_generator)
+        self.private_key_enc = self.aes_cipher.encrypt(self.private_key)
+        data = self.session.post(f"{self.url}{User.loginFirst_path}", data=json.loads({"id": self.id, "authCode": self.authCode, "passHash": self.passHash, "pubKey": self.public_key, "privKey": self.private_key_enc, "data": self.data}))
+        response = json.loads(data.text)
+        try:
+            if response["message"] == "User Created Successfully.":
+                self.cookie = data.headers["Set-Cookie"]
+                self.headers["Cookie"] = self.cookie
+                return 1
+        except:
+            if "error" in response.keys():
+                if response["error"] == "User already registered.":
+                    display('*', f"User Already Registered")
+                    return 0
+                display('-', f"Error in User First Time LogIn: {Back.YELLOW}{response['error']}{Back.RESET}")
+            return -1
 
 if __name__ == "__main__":
     pass
