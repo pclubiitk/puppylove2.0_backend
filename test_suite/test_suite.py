@@ -91,6 +91,7 @@ class Admin:
                 return -1
     def deleteAllUsers(self):
         self.session.get(f"{self.url}{Admin.deleteAllUsers_path}", headers=self.headers)
+        display('+', f"Deleted All Users")
     @staticmethod
     def checkNewUserFormat(user):
         if type(user) == dict:
