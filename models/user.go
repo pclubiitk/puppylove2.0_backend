@@ -21,6 +21,11 @@ type (
 		Dirty   bool   `json:"dirty" bson:"dirty"`
 	}
 )
+type UserPublicKey struct {
+	gorm.Model
+	Id      string `json:"_id" bson:"_id" gorm:"unique"`
+	PubK    string `json:"pubKey" bson:"pubKey"`
+}
 
 type AddNewUser struct {
 	TypeUserNew []TypeUserNew `json:"newuser" binding:"required"`
@@ -39,6 +44,7 @@ type TypeUserFirst struct {
 	AuthCode string `json:"authCode" binding:"required"`
 	PassHash string `json:"passHash" binding:"required"`
 	PubKey   string `json:"pubKey" binding:"required"`
+	PrivKey  string `json:"pubKey" binding:"required"`
 	Data     string `json:"data" binding:"required"`
 }
 

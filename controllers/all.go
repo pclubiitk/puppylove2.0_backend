@@ -11,6 +11,16 @@ import (
 	"gorm.io/gorm"
 )
 
+func FetchPublicKeys(c *gin.Context) {
+	var userModel models.User
+	var publicKeys []models.UserPublicKey
+	fetchPublicKey := Db.Model(&userModel).Select("id", "pubk").Find(&publicKeys)
+	if fetchPublicKey.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Some Error Occured"})
+		return
+	}
+	c.JSON(http.StatusOK, publicKeys)
+}
 func FetchHearts(c *gin.Context) {
 	var heart models.SendHeart
 	var hearts []models.FetchHeartsFirst
