@@ -71,7 +71,7 @@ func AddNewUser(c *gin.Context) {
 			Name:    user.Name,
 			Email:   user.Email,
 			Gender:  user.Gender,
-			Pass:    user.PassHash,
+			Pass:    "",
 			PubK:    "",
 			AuthC:   utils.RandStringRunes(15),
 			Data:    "",

@@ -36,7 +36,6 @@ type TypeUserNew struct {
 	Name     string `json:"name" binding:"required"`
 	Email    string `json:"email" binding:"required"`
 	Gender   string `json:"gender" binding:"required"`
-	PassHash string `json:"passHash" binding:"required"`
 }
 
 type TypeUserFirst struct {

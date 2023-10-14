@@ -44,7 +44,7 @@ class Admin:
     addNewUser_path = "/admin/user/new"
     deleteUser_path = "/admin/user/delete"
     deleteAllUsers_path = "/admin/user/deleteallusers"
-    newUserFields = ["roll", "name", "email", "gender", "passHash"]
+    newUserFields = ["roll", "name", "email", "gender"]
     deleteUserFields = ["roll", "name", "email", "gender"]
     def __init__(self, id, password, host="127.0.0.1", port=8080):
         self.session = requests.session()
@@ -144,6 +144,8 @@ class User:
                     return 0
                 display('-', f"Error in User First Time LogIn: {Back.YELLOW}{response['error']}{Back.RESET}")
             return -1
+    def login(self):
+        pass
 
 if __name__ == "__main__":
     pass
