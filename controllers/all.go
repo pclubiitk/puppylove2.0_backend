@@ -34,6 +34,47 @@ func FetchHearts(c *gin.Context) {
 
 	c.JSON(http.StatusOK, hearts)
 }
+func sentHeartDecoded(c *gin.Context) {
+	info := new(models.sentHeartsDecoded)
+	if err := c.BindJSON(info); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Input data format."})
+		return
+	}
+
+	var heart models.SendHeart
+	var hearts []models.SendHeart
+
+	fetchHeart := Db.Model(&heart).Select("sha", "enc", "gender_of_sender").Find(&hearts)
+
+	if fetchHeart.Error != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "No heart to fetch"})
+	}
+
+	matchCount := struct {
+		male int
+		female int
+	} {
+		0,
+		0,
+	}
+
+	for index, heart := range info.DecodedHearts {
+		enc := heart.Enc
+		gender := heart.GenderOfSender
+		if gender != hearts[index].GenderOfSender {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Data not in sequence"})
+			return
+		}
+		if enc == hearts[index].ENC {
+			if gender == 'M' {
+				matchCount.male += 1
+			} else {
+				matchCount.female += 1
+			}
+		}
+	}
+	c.JSON(http.StatusOK, gin.H{"male": matchCount.male, "female": matchCount.female})
+}
 
 func UserMail(c *gin.Context) {
 	id := c.Param("id")
