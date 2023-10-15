@@ -26,6 +26,9 @@ type FetchHeartsFirst struct {
 	Enc            string `json:"enc"`
 	GenderOfSender string `json:"genderOfSender"`
 }
+type sentHeartsDecoded struct {
+	DecodedHearts []FetchHeartsFirst `json:"decodedHearts" binding:"required"`
+}
 
 // gorm.Model represents the structure of our resource in db
 type (
