@@ -23,7 +23,7 @@ func AuthenticateAdmin() gin.HandlerFunc {
 			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 				c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid Token"})
 				c.Abort()
-				return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+				return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 			}
 			return []byte(jwtSigningKey), nil
 		})
@@ -63,7 +63,7 @@ func AuthenticateUser() gin.HandlerFunc {
 			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 				c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid Token"})
 				c.Abort()
-				return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+				return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 			}
 			return []byte(jwtSigningKey), nil
 		})
@@ -103,7 +103,7 @@ func AuthenticateUserHeartclaim() gin.HandlerFunc {
 			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 				c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid Token Signing Algo"})
 				c.Abort()
-				return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+				return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 			}
 			return []byte(heartjwtSigningKey), nil
 		})

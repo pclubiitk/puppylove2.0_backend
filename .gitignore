@@ -16,3 +16,6 @@
 *.log
 secret.GCPcredentials.json
 secret.yml
+
+
+Dockerfile

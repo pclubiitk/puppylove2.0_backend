@@ -1,13 +1,14 @@
 package controllers
 
 import (
+	"errors"
 	"net/http"
 	"os"
-	"errors"
 	"time"
-	"github.com/pclubiitk/puppylove2.0_backend/models"
+
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"
+	"github.com/pclubiitk/puppylove2.0_backend/models"
 	"gorm.io/gorm"
 )
 
@@ -48,7 +49,7 @@ func UserLogin(c *gin.Context) {
 	}
 
 	http.SetCookie(c.Writer, cookie)
-	c.JSON(http.StatusOK, gin.H{"message": "User logged in successfully !!"})
+	c.JSON(http.StatusOK, gin.H{"message": "User logged in successfully !!", "data": loginmodel.Data})
 }
 
 func UserLogout(c *gin.Context) {
