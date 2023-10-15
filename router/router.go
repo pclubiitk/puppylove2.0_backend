@@ -2,9 +2,10 @@ package router
 
 import (
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 	"github.com/pclubiitk/puppylove2.0_backend/controllers"
 	"github.com/pclubiitk/puppylove2.0_backend/db"
-	"github.com/gin-gonic/gin"
 )
 
 func PuppyRoute(r *gin.Engine, db db.PuppyDb) {
