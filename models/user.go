@@ -14,6 +14,7 @@ type (
 		Gender  string `json:"gender" bson:"gender"`
 		Pass    string `json:"passHash" bson:"passHash"`
 		PubK    string `json:"pubKey" bson:"pubKey"`
+		PrivK   string `json:"privKey" bson:"privKey"`
 		AuthC   string `json:"authCode" bson:"authCode"`
 		Data    string `json:"data" bson:"data"`
 		Submit  bool   `json:"submitted" bson:"submitted"`
