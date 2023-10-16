@@ -4,6 +4,23 @@ import (
 	"gorm.io/gorm"
 )
 
+type Heart struct {
+	ENC        string `json:"enc" binding:"required"`
+	SHA        string `json:"sha" binding:"required"`
+	Id_encrypt string `json:"id_encrypt" binding:"required"`
+}
+
+type Hearts struct {
+	Heart1 Heart `json:"heart1" binding:"required"`
+	Heart2 Heart `json:"heart2" binding:"required"`
+	Heart3 Heart `json:"heart3" binding:"required"`
+	Heart4 Heart `json:"heart4" binding:"required"`
+}
+
+type SendHeartVirtual struct {
+	Hearts Hearts `json:"hearts" binding:"required"`
+}
+
 type SendHeartFirst struct {
 	GenderOfSender string `json:"genderOfSender" binding:"required"`
 	ENC1           string `json:"enc1" binding:"required"`
