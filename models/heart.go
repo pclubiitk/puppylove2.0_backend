@@ -5,15 +5,15 @@ import (
 )
 
 type SendHeartFirst struct {
-	GenderOfSender string `json:"genderOfSender" binding:"required"`
-	ENC1           string `json:"enc1" binding:"required"`
-	SHA1           string `json:"sha1" binding:"required"`
-	ENC2           string `json:"enc2"`
-	SHA2           string `json:"sha2"`
-	ENC3           string `json:"enc3"`
-	SHA3           string `json:"sha3"`
-	ENC4           string `json:"enc4"`
-	SHA4           string `json:"sha4"`
+	GenderOfSender string             `json:"genderOfSender" binding:"required"`
+	ENC1           string             `json:"enc1" binding:"required"`
+	SHA1           string             `json:"sha1" binding:"required"`
+	ENC2           string             `json:"enc2"`
+	SHA2           string             `json:"sha2"`
+	ENC3           string             `json:"enc3"`
+	SHA3           string             `json:"sha3"`
+	ENC4           string             `json:"enc4"`
+	SHA4           string             `json:"sha4"`
 	ReturnHearts   []VerifyHeartClaim `json:"returnhearts"`
 }
 
@@ -26,7 +26,7 @@ type FetchHeartsFirst struct {
 	Enc            string `json:"enc"`
 	GenderOfSender string `json:"genderOfSender"`
 }
-type sentHeartsDecoded struct {
+type SentHeartsDecoded struct {
 	DecodedHearts []FetchHeartsFirst `json:"decodedHearts" binding:"required"`
 }
 
@@ -43,16 +43,16 @@ type (
 type (
 	HeartClaims struct {
 		gorm.Model
-		Id string `json:"enc" bson:"enc" gorm:"unique"`
-		SHA string `json:"sha" bson:"sha" gorm:"unique"`
-		Roll  string `json:"roll"`
+		Id   string `json:"enc" bson:"enc" gorm:"unique"`
+		SHA  string `json:"sha" bson:"sha" gorm:"unique"`
+		Roll string `json:"roll"`
 	}
 )
 
 // --------- Returning Heart Below ---------
 
 type UserReturnHearts struct {
-	ReturnHearts   []UserReturnHeart `json:"returnhearts" binding:"required"`
+	ReturnHearts []UserReturnHeart `json:"returnhearts" binding:"required"`
 }
 
 type UserReturnHeart struct {
