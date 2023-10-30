@@ -35,8 +35,8 @@ func FetchHearts(c *gin.Context) {
 
 	c.JSON(http.StatusOK, hearts)
 }
-func sentHeartDecoded(c *gin.Context) {
-	info := new(models.sentHeartsDecoded)
+func SentHeartDecoded(c *gin.Context) {
+	info := new(models.SentHeartsDecoded)
 	if err := c.BindJSON(info); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Input data format."})
 		return
@@ -52,9 +52,9 @@ func sentHeartDecoded(c *gin.Context) {
 	}
 
 	matchCount := struct {
-		male int
+		male   int
 		female int
-	} {
+	}{
 		0,
 		0,
 	}
@@ -67,7 +67,7 @@ func sentHeartDecoded(c *gin.Context) {
 			return
 		}
 		if enc == hearts[index].ENC {
-			if gender == 'M' {
+			if gender == "M" {
 				matchCount.male += 1
 			} else {
 				matchCount.female += 1
