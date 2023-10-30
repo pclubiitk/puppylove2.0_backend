@@ -73,6 +73,7 @@ func AddNewUser(c *gin.Context) {
 			Gender:  user.Gender,
 			Pass:    "",
 			PubK:    "",
+			PrivK:   "",
 			AuthC:   utils.RandStringRunes(15),
 			Data:    "",
 			Submit:  false,

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"net/http"
 	"time"
+	"encoding/json"
 
 	"github.com/gin-gonic/gin"
 	"github.com/pclubiitk/puppylove2.0_backend/models"
@@ -66,6 +67,7 @@ func UserFirstLogin(c *gin.Context) {
 		Id:    info.Id,
 		Pass:  info.PassHash,
 		PubK:  info.PubKey,
+		PrivK: info.PrivKey,
 		AuthC: " ",
 		Data:  info.Data,
 		Dirty: true,
@@ -183,6 +185,36 @@ func SendHeart(c *gin.Context) {
 	http.SetCookie(c.Writer, cookie)
 
 	c.JSON(http.StatusAccepted, gin.H{"message": "Hearts Sent Successfully !!"})
+}
+
+func SendHeartVirtual(c *gin.Context) {
+	info := new(models.SendHeartVirtual)
+	if err := c.BindJSON(info); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Input data format."})
+		return
+	}
+
+	userID, _ := c.Get("user_id")
+	var user models.User
+	record := Db.Model(&user).Where("id = ?", userID).First(&user)
+	if record.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Something went wrong, Please try again."})
+		return
+	}
+
+	jsonData, err := json.Marshal(info.Hearts)
+	if err != nil {
+		return
+	}
+
+	if err := record.Updates(models.User{
+		Data: string(jsonData),
+	}).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Something went wrong, Please try again."})
+		return
+	}
+
+	c.JSON(http.StatusAccepted, gin.H{"message": "Virtual Hearts Sent Successfully !!"})
 }
 
 // need to change the flow a bit.
