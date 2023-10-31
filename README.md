@@ -60,3 +60,16 @@ Server->>Me: How do I verify ?
 Me->>Server: Here is my k(210667_21xxxx_&89h9hKJbx).<br/>Verify it with SHA.
 Me->My: Matched
  ```
+
+## Populate Users in Postgresql
+In test_suite/info.json replace *adminID* with your **SUPERUSER** of postgres and *adminPASS* with its **password**. <br />
+And don't make PR with your credentials.<br />
+<!-- -->
+Install the dependencies for Test Suite:
+```bash
+pip install -r test_suite/requirements.txt
+```
+To Populate all the Users
+```bash
+python test_suite/populate.py
+```
