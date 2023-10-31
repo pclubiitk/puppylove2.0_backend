@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
@@ -25,6 +26,7 @@ func main() {
 	store := cookie.NewStore([]byte(CfgAdminPass))
 	r := gin.Default()
 	r.Use(sessions.Sessions("adminsession", store))
+	r.Use(cors.Default())
 	router.PuppyRoute(r, *Db)
 
 	r.Run(":8080")
