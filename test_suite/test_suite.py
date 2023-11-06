@@ -167,10 +167,19 @@ class User:
             if response["message"] == "User logged in successfully !!":
                 self.cookie = data.headers["Set-Cookie"]
                 self.headers["Cookie"] = self.cookie
-                print(response)
                 self.public_key = response["pubKey"]
                 self.private_key_enc = response["pvtKey_Enc"]
                 self.private_key = self.aes_cipher.decrypt(self.private_key_enc)
+                return 1
+        except:
+            if "error" in response.keys():
+                display('-', f"Error in User LogIn: {Back.YELLOW}{response['error']}{Back.RESET}")
+            return -1
+    def logout(self):
+        data = self.session.get(f"{self.url}{User.logoutUrl}", headers=self.headers)
+        response = json.loads(data.text)
+        try:
+            if response["message"] == "User logged out successfully.":
                 return 1
         except:
             if "error" in response.keys():
