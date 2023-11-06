@@ -20,6 +20,7 @@ type (
 		Submit  bool   `json:"submitted" bson:"submitted"`
 		Matches string `json:"matches" bson:"matches"`
 		Dirty   bool   `json:"dirty" bson:"dirty"`
+		Publish bool   `json:"publish" bson:"publish"`
 	}
 )
 type UserPublicKey struct {
@@ -33,10 +34,10 @@ type AddNewUser struct {
 }
 
 type TypeUserNew struct {
-	Id       string `json:"roll" binding:"required"`
-	Name     string `json:"name" binding:"required"`
-	Email    string `json:"email" binding:"required"`
-	Gender   string `json:"gender" binding:"required"`
+	Id     string `json:"roll" binding:"required"`
+	Name   string `json:"name" binding:"required"`
+	Email  string `json:"email" binding:"required"`
+	Gender string `json:"gender" binding:"required"`
 }
 
 type TypeUserFirst struct {

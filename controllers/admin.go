@@ -4,10 +4,11 @@ import (
 	"net/http"
 	"os"
 	"time"
-	"github.com/pclubiitk/puppylove2.0_backend/utils"
+
+	"github.com/gin-gonic/gin"
 	"github.com/pclubiitk/puppylove2.0_backend/db"
 	"github.com/pclubiitk/puppylove2.0_backend/models"
-	"github.com/gin-gonic/gin"
+	"github.com/pclubiitk/puppylove2.0_backend/utils"
 )
 
 var Db db.PuppyDb
@@ -79,6 +80,7 @@ func AddNewUser(c *gin.Context) {
 			Submit:  false,
 			Matches: "",
 			Dirty:   false,
+			Publish: false,
 		}
 
 		// Insert the user into the database

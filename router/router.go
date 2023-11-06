@@ -30,6 +30,7 @@ func PuppyRoute(r *gin.Engine, db db.PuppyDb) {
 		// users.GET("/fetchreturnhearts", controllers.FetchReturnHearts)
 		users.POST("/sendheart", controllers.SendHeart)
 		users.POST("/claimheart", controllers.HeartClaim)
+		users.POST("/publish", controllers.Publish)
 	}
 	late := r.Group("/special")
 	{

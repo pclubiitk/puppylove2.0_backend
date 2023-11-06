@@ -1,10 +1,10 @@
 package controllers
 
 import (
+	"encoding/json"
 	"errors"
 	"net/http"
 	"time"
-	"encoding/json"
 
 	"github.com/gin-gonic/gin"
 	"github.com/pclubiitk/puppylove2.0_backend/models"
@@ -316,4 +316,14 @@ func ReturnClaimedHeartLate(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusAccepted, gin.H{"message": "Congrats !!, we just avoided unexpected event with probability < 1/1000."})
+}
+
+func Publish(c *gin.Context) {
+	userID, _ := c.Get("user_id")
+	var user models.User
+	record := Db.Model(&user).Where("id = ?", userID).Update("Publish", true)
+	if record.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Something went wrong, Please try again."})
+		return
+	}
 }
