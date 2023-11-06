@@ -127,6 +127,17 @@ class User:
         self.aes_cipher = AESCipher(self.password)
         self.passHash = hashlib.sha256(self.password.encode()).hexdigest()
         self.headers = {}
+    def getMail(self):
+        data = self.session.get(f"{self.url}{User.mailUrl}{self.id}")
+        print(data.text)
+        response = json.loads(data.text)
+        try:
+            if response["message"] == "Auth. code sent successfully !!":
+                return 1
+        except:
+            if "error" in response.keys():
+                display('-', f"Error in User LogIn: {Back.YELLOW}{response['error']}{Back.RESET}")
+            return -1
     def loginFirst(self, authCode):
         self.authCode = authCode
         self.public_key_generator.generate_key(crypto.TYPE_RSA, 2048)
