@@ -116,6 +116,7 @@ class User:
     logoutUrl = "/session/logout"
     mailUrl = "/users/mail/"
     publicKeys_url = "/users/fetchPublicKeys"
+    sentHearts_url = "/users/fetchall"
     def __init__(self, id, password, host="127.0.0.1", port=8080):
         self.session = requests.session()
         self.host = host
@@ -129,6 +130,7 @@ class User:
         self.passHash = hashlib.sha256(self.password.encode()).hexdigest()
         self.headers = {}
         self.public_keys = {}
+        self.sentHeartsTable = []
     def getMail(self):
         data = self.session.get(f"{self.url}{User.mailUrl}{self.id}")
         response = json.loads(data.text)
@@ -175,9 +177,22 @@ class User:
             if "error" in response.keys():
                 display('-', f"Error in User LogIn: {Back.YELLOW}{response['error']}{Back.RESET}")
             return -1
+    def getSentHearts(self):
+        data = self.session.get(f"{self.url}{User.sentHearts_url}", headers=self.headers)
+        response = json.loads(data.text)
+        self.sentHeartsTable = []
+        try:
+            for heart in response:
+                self.sentHeartsTable.append([heart["end"], heart["genderOfSender"]])
+            return 1
+        except:
+            if "error" in response.keys():
+                display('-', f"Error in Getting Public Keys: {Back.YELLOW}{response['error']}{Back.RESET}")
+            return -1
     def getPublicKeys(self):
         data = self.session.get(f"{self.url}{User.publicKeys_url}", headers=self.headers)
         response = json.loads(data.text)
+        self.public_keys = {}
         try:
             for entity in response:
                 self.public_keys[entity["_id"]] = entity["pubKey"]
