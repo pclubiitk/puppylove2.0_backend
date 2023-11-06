@@ -71,5 +71,6 @@ pip install -r test_suite/requirements.txt
 ```
 To Populate all the Users
 ```bash
-python test_suite/populate.py
+cd test_suite
+python populate.py
 ```
