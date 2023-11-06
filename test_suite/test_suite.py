@@ -115,6 +115,7 @@ class User:
     loginUrl = "/session/login"
     logoutUrl = "/session/logout"
     mailUrl = "/users/mail/"
+    publicKeys_url = "/users/fetchPublicKeys"
     def __init__(self, id, password, host="127.0.0.1", port=8080):
         self.session = requests.session()
         self.host = host
@@ -127,9 +128,9 @@ class User:
         self.aes_cipher = AESCipher(self.password)
         self.passHash = hashlib.sha256(self.password.encode()).hexdigest()
         self.headers = {}
+        self.public_keys = {}
     def getMail(self):
         data = self.session.get(f"{self.url}{User.mailUrl}{self.id}")
-        print(data.text)
         response = json.loads(data.text)
         try:
             if response["message"] == "Auth. code sent successfully !!":
@@ -145,7 +146,6 @@ class User:
         self.private_key = ''.join(crypto.dump_privatekey(crypto.FILETYPE_PEM, self.public_key_generator).decode().split('\n')[1:-2])
         self.private_key_enc = self.aes_cipher.encrypt(self.private_key).decode()
         self.data = "FIRST_LOGIN"
-        print({"id": self.id, "authCode": self.authCode, "passHash": self.passHash, "pubKey": self.public_key, "privKey": self.private_key_enc, "data": self.data})
         data = self.session.post(f"{self.url}{User.loginFirst_path}", data=json.dumps({"roll": self.id, "authCode": self.authCode, "passHash": self.passHash, "pubKey": self.public_key, "privKey": self.private_key_enc, "data": self.data}))
         response = json.loads(data.text)
         try:
@@ -175,6 +175,17 @@ class User:
             if "error" in response.keys():
                 display('-', f"Error in User LogIn: {Back.YELLOW}{response['error']}{Back.RESET}")
             return -1
+    def getPublicKeys(self):
+        data = self.session.get(f"{self.url}{User.publicKeys_url}", headers=self.headers)
+        response = json.loads(data.text)
+        try:
+            for entity in response:
+                self.public_keys[entity["_id"]] = entity["pubKey"]
+            return 1
+        except:
+            if "error" in response.keys():
+                display('-', f"Error in Getting Public Keys: {Back.YELLOW}{response['error']}{Back.RESET}")
+            return -1
     def logout(self):
         data = self.session.get(f"{self.url}{User.logoutUrl}", headers=self.headers)
         response = json.loads(data.text)
@@ -183,7 +194,7 @@ class User:
                 return 1
         except:
             if "error" in response.keys():
-                display('-', f"Error in User LogIn: {Back.YELLOW}{response['error']}{Back.RESET}")
+                display('-', f"Error in User LogOut: {Back.YELLOW}{response['error']}{Back.RESET}")
             return -1
 
 if __name__ == "__main__":
