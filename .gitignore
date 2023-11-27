@@ -16,3 +16,4 @@
 *.log
 secret.GCPcredentials.json
 secret.yml
+__pycache__
