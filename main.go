@@ -19,7 +19,6 @@ func main() {
 		panic("Error loading .env file")
 	}
 	var CfgAdminPass = os.Getenv("CfgAdminPass")
-
 	Db := db.InitDB()
 
 	utils.Randinit()

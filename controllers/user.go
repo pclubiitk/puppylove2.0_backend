@@ -327,3 +327,13 @@ func Publish(c *gin.Context) {
 		return
 	}
 }
+
+func GetActiveUsers(c *gin.Context) {
+	var users []models.User
+	Db.Find(&users)
+	var results []string
+	for _, user := range users {
+		results = append(results, user.Id)
+	}
+	c.JSON(http.StatusOK, gin.H{"users": results})
+}
