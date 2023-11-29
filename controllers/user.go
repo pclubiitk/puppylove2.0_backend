@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"net/url"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -64,13 +65,14 @@ func UserFirstLogin(c *gin.Context) {
 
 	// var newuser models.User
 	if err := record.Updates(models.User{
-		Id:    info.Id,
-		Pass:  info.PassHash,
-		PubK:  info.PubKey,
-		PrivK: info.PrivKey,
-		AuthC: " ",
-		Data:  info.Data,
-		Dirty: true,
+		Id:     info.Id,
+		Pass:   info.PassHash,
+		PubK:   info.PubKey,
+		PrivK:  info.PrivKey,
+		AuthC:  " ",
+		Data:   info.Data,
+		Claims: "",
+		Dirty:  true,
 	}).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Something went wrong, Please try again."})
 		return
@@ -198,7 +200,7 @@ func SendHeartVirtual(c *gin.Context) {
 	var user models.User
 	record := Db.Model(&user).Where("id = ?", userID).First(&user)
 	if record.Error != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Something went wrong, Please try again."})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "User does not exist."})
 		return
 	}
 
@@ -210,7 +212,7 @@ func SendHeartVirtual(c *gin.Context) {
 	if err := record.Updates(models.User{
 		Data: string(jsonData),
 	}).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Something went wrong, Please try again."})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not update Data field of User."})
 		return
 	}
 
@@ -259,11 +261,13 @@ func HeartClaim(c *gin.Context) {
 		return
 	}
 
+	claim_status := "true"
 	heartModel := models.SendHeart{}
 	verifyheart := Db.Model(&heartModel).Where("sha = ? AND enc = ?", info.SHA, info.Enc).First(&heartModel)
 	if verifyheart.Error != nil {
 		if errors.Is(verifyheart.Error, gorm.ErrRecordNotFound) {
-			c.JSON(http.StatusForbidden, gin.H{"error": "Invalid Heart Claim Request."})
+			// c.JSON(http.StatusForbidden, gin.H{"error": "Invalid Heart Claim Request."})
+			claim_status = "false"
 		} else {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": verifyheart.Error.Error()})
 		}
@@ -286,10 +290,37 @@ func HeartClaim(c *gin.Context) {
 		return
 	}
 
+	var user models.User
+	record := Db.Model(&user).Where("id = ?", userID).First(&user)
+	if record.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "User does not exist."})
+		return
+	}
+
+	jsonClaim, err := json.Marshal(info)
+	if err != nil {
+		return
+	}
+
+	newClaim := string(jsonClaim)
+	// Encoding '+' present claim so that the claim can be concatenated with '+' and later retrieved
+	newClaim_enc := url.QueryEscape(newClaim)
+
+	if user.Claims == "" {
+		user.Claims = newClaim_enc
+	} else {
+		user.Claims = user.Claims + "+" + newClaim_enc
+	}
+
+	if err := Db.Save(&user).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not update Claims field of User."})
+		return
+	}
+
 	// TODO: (RESOLVED) Implement "SendClaimedHeartBack" token logic -- DONE ?
 	// generate a token for "SendClaimedHeartBack" which is valid for 10? mins.
 
-	c.JSON(http.StatusAccepted, gin.H{"message": "Heart Claim Success"})
+	c.JSON(http.StatusAccepted, gin.H{"message": "Heart Claim Success", "claim_status": claim_status})
 }
 
 // TODO: (RESOLVED) Current issue is that if the user changes the enc of the claimed hash(which is very timeconsuming btw ;), there is no way to verify here. -- DONE
