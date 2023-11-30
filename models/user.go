@@ -17,6 +17,7 @@ type (
 		PrivK   string `json:"privKey" bson:"privKey"`
 		AuthC   string `json:"authCode" bson:"authCode"`
 		Data    string `json:"data" bson:"data"`
+		Claims  string `json:"claims" bson:"claims"`
 		Submit  bool   `json:"submitted" bson:"submitted"`
 		Matches string `json:"matches" bson:"matches"`
 		Dirty   bool   `json:"dirty" bson:"dirty"`

@@ -35,8 +35,9 @@ type SendHeartFirst struct {
 }
 
 type VerifyHeartClaim struct {
-	Enc string `json:"enc" binding:"required"`
-	SHA string `json:"sha" binding:"required"`
+	Enc            string `json:"enc" binding:"required"`
+	SHA            string `json:"sha" binding:"required"`
+	GenderOfSender string `json:"genderOfSender" binding:"required"`
 }
 
 type FetchHeartsFirst struct {
@@ -84,7 +85,7 @@ type UserReturnHeart struct {
 type (
 	ReturnHearts struct {
 		gorm.Model
-		SHA string `json:"sha" bson:"sha" gorm:"unique"`
+		SHA string `json:"sha" bson:"sha"`
 		ENC string `json:"enc" bson:"enc" gorm:"unique"`
 	}
 )
