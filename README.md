@@ -74,3 +74,13 @@ To Populate all the Users
 cd test_suite
 python populate.py
 ```
+To register all the users
+```bash
+cd test_suite
+python register_all_users.py {password} {database} {host} {port}
+```
+Where:
+* password: Password for all the users
+* database: Database name (Default = puppylove)
+* host: Default = 127.0.0.1
+* port: Default = 5432
