@@ -22,6 +22,20 @@ func FetchPublicKeys(c *gin.Context) {
 	c.JSON(http.StatusOK, publicKeys)
 }
 
+func FetchReturnHearts(c *gin.Context) {
+	var returnedHeart models.ReturnHearts
+	var returnedHearts []model.FetchReturnedHearts
+	
+	fetchedReturnedHearts := Db.Model(&returnedHeart).Select("sha", "enc").Find(&returnedHearts)
+
+	if fetchedReturnedHearts.Error != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "No returend hearts to fetch."})
+		return
+	}
+
+	c.JSON(http.StatusOk, returnedHearts)
+}
+
 func FetchHearts(c *gin.Context) {
 	var heart models.SendHeart
 	var hearts []models.FetchHeartsFirst
