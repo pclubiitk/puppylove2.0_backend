@@ -1,6 +1,6 @@
 # Puppylove2.0 Backend
 
->Run `populate.py` in Stress test to populate your local `PostgreSQL` database with y22 data.
+>Commands for running docker container are in `Docker.md`
 
 ## Me-My Encryption
 
