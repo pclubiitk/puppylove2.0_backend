@@ -24,8 +24,8 @@ func FetchPublicKeys(c *gin.Context) {
 
 func FetchReturnHearts(c *gin.Context) {
 	var returnedHeart models.ReturnHearts
-	var returnedHearts []model.FetchReturnedHearts
-	
+	var returnedHearts []models.FetchReturnedHearts
+
 	fetchedReturnedHearts := Db.Model(&returnedHeart).Select("sha", "enc").Find(&returnedHearts)
 
 	if fetchedReturnedHearts.Error != nil {
@@ -33,7 +33,7 @@ func FetchReturnHearts(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOk, returnedHearts)
+	c.JSON(http.StatusOK, returnedHearts)
 }
 
 func FetchHearts(c *gin.Context) {
@@ -117,15 +117,3 @@ func UserMail(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{"message": "Auth. code sent successfully !!"})
 }
-
-// func FetchReturnHearts(c *gin.Context) {
-// 	heartModel := models.ReturnHearts{}
-//     var hearts []models.ReturnHearts
-// 	fetchheart := Db.Model(&heartModel).Select("enc").Find(hearts)
-// 	if fetchheart.Error != nil {
-// 		c.JSON(http.StatusNotFound, gin.H{"error" : "No hearts to fetch."})
-//         return
-// 	}
-
-// 	c.JSON(http.StatusOK, hearts)
-// }

@@ -3,6 +3,7 @@ package db
 import (
 	"fmt"
 	"os"
+
 	"github.com/pclubiitk/puppylove2.0_backend/models"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -29,7 +30,7 @@ func InitDB() *PuppyDb {
 		panic(err)
 	}
 
-	db.AutoMigrate(&models.User{}, &models.SendHeart{}, &models.HeartClaims{}, &models.ReturnHearts{})
+	db.AutoMigrate(&models.User{}, &models.SendHeart{}, &models.HeartClaims{}, &models.ReturnHearts{}, &models.MatchTable{})
 	fmt.Println("Connected to the database!")
 	// sqlDB.Close()
 	return &PuppyDb{db}

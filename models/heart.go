@@ -93,3 +93,11 @@ type (
 type FetchReturnHeart struct {
 	ENC string `json:"enc" binding:"required" gorm:"unique"`
 }
+
+type (
+	MatchTable struct {
+		gorm.Model
+		Roll1 string `json:"roll1" bson:"roll1"`
+		Roll2 string `json:"roll2" bson:"roll2"`
+	}
+)
