@@ -44,6 +44,10 @@ type FetchHeartsFirst struct {
 	Enc            string `json:"enc"`
 	GenderOfSender string `json:"genderOfSender"`
 }
+type FetchReturnedHearts struct {
+	SHA string `json:"sha"`
+	Enc string `json:"enc"`
+}
 type SentHeartsDecoded struct {
 	DecodedHearts []FetchHeartsFirst `json:"decodedHearts" binding:"required"`
 }

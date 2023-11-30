@@ -112,6 +112,11 @@ class Admin:
         return True
 class User:
     loginFirst_path = "/users/login/first"
+    loginUrl = "/session/login"
+    logoutUrl = "/session/logout"
+    mailUrl = "/users/mail/"
+    publicKeys_url = "/users/fetchPublicKeys"
+    sentHearts_url = "/users/fetchall"
     def __init__(self, id, password, host="127.0.0.1", port=8080):
         self.session = requests.session()
         self.host = host
@@ -122,15 +127,28 @@ class User:
         self.data = ''
         self.public_key_generator = crypto.PKey()
         self.aes_cipher = AESCipher(self.password)
+        self.passHash = hashlib.sha256(self.password.encode()).hexdigest()
         self.headers = {}
+        self.public_keys = {}
+        self.sentHeartsTable = []
+    def getMail(self):
+        data = self.session.get(f"{self.url}{User.mailUrl}{self.id}")
+        response = json.loads(data.text)
+        try:
+            if response["message"] == "Auth. code sent successfully !!":
+                return 1
+        except:
+            if "error" in response.keys():
+                display('-', f"Error in User LogIn: {Back.YELLOW}{response['error']}{Back.RESET}")
+            return -1
     def loginFirst(self, authCode):
         self.authCode = authCode
-        self.passHash = hashlib.sha256(self.password).hexdigest()
-        public_key_generator = self.public_key_generator.generate_key(crypto.TYPE_RSA, 2048)
-        self.public_key = crypto.dump_publickey(crypto.FILETYPE_PEM, public_key_generator)
-        self.private_key = crypto.dump_privatekey(crypto.FILETYPE_PEM, public_key_generator)
-        self.private_key_enc = self.aes_cipher.encrypt(self.private_key)
-        data = self.session.post(f"{self.url}{User.loginFirst_path}", data=json.loads({"id": self.id, "authCode": self.authCode, "passHash": self.passHash, "pubKey": self.public_key, "privKey": self.private_key_enc, "data": self.data}))
+        self.public_key_generator.generate_key(crypto.TYPE_RSA, 2048)
+        self.public_key = ''.join(crypto.dump_publickey(crypto.FILETYPE_PEM, self.public_key_generator).decode().split('\n')[1:-2])
+        self.private_key = ''.join(crypto.dump_privatekey(crypto.FILETYPE_PEM, self.public_key_generator).decode().split('\n')[1:-2])
+        self.private_key_enc = self.aes_cipher.encrypt(self.private_key).decode()
+        self.data = "FIRST_LOGIN"
+        data = self.session.post(f"{self.url}{User.loginFirst_path}", data=json.dumps({"roll": self.id, "authCode": self.authCode, "passHash": self.passHash, "pubKey": self.public_key, "privKey": self.private_key_enc, "data": self.data}))
         response = json.loads(data.text)
         try:
             if response["message"] == "User Created Successfully.":
@@ -145,7 +163,54 @@ class User:
                 display('-', f"Error in User First Time LogIn: {Back.YELLOW}{response['error']}{Back.RESET}")
             return -1
     def login(self):
-        pass
+        data = self.session.post(f"{self.url}{User.loginUrl}", headers=self.headers, data=json.dumps({"_id": self.id, "passHash": self.passHash}))
+        response = json.loads(data.text)
+        try:
+            if response["message"] == "User logged in successfully !!":
+                self.cookie = data.headers["Set-Cookie"]
+                self.headers["Cookie"] = self.cookie
+                self.public_key = response["pubKey"]
+                self.private_key_enc = response["pvtKey_Enc"]
+                self.private_key = self.aes_cipher.decrypt(self.private_key_enc)
+                return 1
+        except:
+            if "error" in response.keys():
+                display('-', f"Error in User LogIn: {Back.YELLOW}{response['error']}{Back.RESET}")
+            return -1
+    def getSentHearts(self):
+        data = self.session.get(f"{self.url}{User.sentHearts_url}", headers=self.headers)
+        response = json.loads(data.text)
+        self.sentHeartsTable = []
+        try:
+            for heart in response:
+                self.sentHeartsTable.append([heart["end"], heart["genderOfSender"]])
+            return 1
+        except:
+            if "error" in response.keys():
+                display('-', f"Error in Getting Public Keys: {Back.YELLOW}{response['error']}{Back.RESET}")
+            return -1
+    def getPublicKeys(self):
+        data = self.session.get(f"{self.url}{User.publicKeys_url}", headers=self.headers)
+        response = json.loads(data.text)
+        self.public_keys = {}
+        try:
+            for entity in response:
+                self.public_keys[entity["_id"]] = entity["pubKey"]
+            return 1
+        except:
+            if "error" in response.keys():
+                display('-', f"Error in Getting Public Keys: {Back.YELLOW}{response['error']}{Back.RESET}")
+            return -1
+    def logout(self):
+        data = self.session.get(f"{self.url}{User.logoutUrl}", headers=self.headers)
+        response = json.loads(data.text)
+        try:
+            if response["message"] == "User logged out successfully.":
+                return 1
+        except:
+            if "error" in response.keys():
+                display('-', f"Error in User LogOut: {Back.YELLOW}{response['error']}{Back.RESET}")
+            return -1
 
 if __name__ == "__main__":
     pass

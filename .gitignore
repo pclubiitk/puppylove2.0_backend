@@ -16,4 +16,4 @@
 *.log
 secret.GCPcredentials.json
 secret.yml
-__pycache__
+test_suite/__pycache__/*
