@@ -27,7 +27,7 @@ if __name__ == "__main__":
     for entity in data:
         idAuthCode[entity[0]] = entity[1]
     for index, entity in enumerate(idAuthCode.items()):
-        print(f"{index}", end='')
         id, auth_c = entity
         user = User(id, password)
         user.loginFirst(auth_c)
+        print(f"\r{index+1}/{len(idAuthCode)} ({(index+1)/len(idAuthCode):.2f})", end='')
