@@ -26,7 +26,7 @@ func FetchReturnHearts(c *gin.Context) {
 	var returnedHeart models.ReturnHearts
 	var returnedHearts []models.FetchReturnedHearts
 
-	fetchedReturnedHearts := Db.Model(&returnedHeart).Select("sha", "enc").Find(&returnedHearts)
+	fetchedReturnedHearts := Db.Model(&returnedHeart).Select("enc").Find(&returnedHearts)
 
 	if fetchedReturnedHearts.Error != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "No returend hearts to fetch."})
