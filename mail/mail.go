@@ -13,7 +13,7 @@ func SendMail(name string, to string, authCode string) error {
 	password := os.Getenv("EMAILPASS")
 
 	// 	// smtp server configuration.
-	smtpHost := "smtp.cc.iitk.ac.in"
+	smtpHost := "mmtp.iitk.ac.in"
 	smtpPort := "25"
 
 	var toSend []string

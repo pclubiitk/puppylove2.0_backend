@@ -1,8 +1,10 @@
 package controllers
 
 import (
+	"crypto/sha256"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"net/url"
 	"time"
@@ -371,4 +373,43 @@ func GetActiveUsers(c *gin.Context) {
 
 	}
 	c.JSON(http.StatusOK, gin.H{"users": results})
+}
+
+func VerifyReturnHeart(c *gin.Context) {
+	info := new(models.VerifyReturnHeartClaim)
+	if err := c.BindJSON(info); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Input data format."})
+		return
+	}
+	h := sha256.New()
+	h.Write([]byte(info.Secret))
+	bs := h.Sum(nil)
+	hash := fmt.Sprintf("%x", bs)
+	heartModel := models.ReturnHearts{}
+	verifyheart := Db.Model(&heartModel).Where("sha = ? enc = ?", hash, info.Enc).First(&heartModel)
+	if verifyheart.Error != nil {
+		if errors.Is(verifyheart.Error, gorm.ErrRecordNotFound) {
+			c.JSON(http.StatusForbidden, gin.H{"error": "Invalid Heart Claim Request."})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": verifyheart.Error.Error()})
+		}
+		return
+	}
+	if err := Db.Model(&heartModel).Where("sha = ? AND enc = ?", hash, info.Enc).Unscoped().Delete(&heartModel).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	var heartClaim models.HeartClaims
+	Db.Model(heartClaim).Where("sha = ?", hash).First(heartClaim)
+	userID, _ := c.Get("user_id")
+	returnHeartClaim := models.MatchTable{
+		Roll1: userID.(string),
+		Roll2: heartClaim.Roll,
+	}
+	if err := Db.Create(&returnHeartClaim).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+		return
+	}
+	c.JSON(http.StatusAccepted, gin.H{"message": "Heart Claim Success"})
+	return
 }
