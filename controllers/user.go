@@ -375,6 +375,9 @@ func GetActiveUsers(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"users": results})
 }
 
+/*
+This function would verify heart claims from returned table and would take care match logic adding matched rollno to matching table
+*/
 func VerifyReturnHeart(c *gin.Context) {
 	info := new(models.VerifyReturnHeartClaim)
 	if err := c.BindJSON(info); err != nil {
