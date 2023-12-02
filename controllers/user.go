@@ -411,5 +411,4 @@ func VerifyReturnHeart(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusAccepted, gin.H{"message": "Heart Claim Success"})
-	return
 }
