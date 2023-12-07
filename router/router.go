@@ -36,7 +36,7 @@ func PuppyRoute(r *gin.Engine, db db.PuppyDb) {
 	late := r.Group("/special")
 	{
 		late.Use(controllers.AuthenticateUser())
-		late.Use(controllers.AuthenticateUserHeartclaim())
+		// late.Use(controllers.AuthenticateUserHeartclaim())
 		late.POST("/returnclaimedheartlate", controllers.ReturnClaimedHeartLate)
 	}
 
