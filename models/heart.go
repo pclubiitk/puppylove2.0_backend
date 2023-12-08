@@ -5,16 +5,16 @@ import (
 )
 
 type Heart struct {
-	ENC        string `json:"enc" binding:"required"`
-	SHA        string `json:"sha" binding:"required"`
-	Id_encrypt string `json:"id_encrypt" binding:"required"`
+	ENC        string `json:"enc"`
+	SHA        string `json:"sha"`
+	Id_encrypt string `json:"id_encrypt"`
 }
 
 type Hearts struct {
 	Heart1 Heart `json:"heart1" binding:"required"`
-	Heart2 Heart `json:"heart2" binding:"required"`
-	Heart3 Heart `json:"heart3" binding:"required"`
-	Heart4 Heart `json:"heart4" binding:"required"`
+	Heart2 Heart `json:"heart2"`
+	Heart3 Heart `json:"heart3"`
+	Heart4 Heart `json:"heart4"`
 }
 
 type SendHeartVirtual struct {

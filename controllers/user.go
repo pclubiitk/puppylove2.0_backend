@@ -453,7 +453,7 @@ func VerifyReturnHeart(c *gin.Context) {
 	bs := h.Sum(nil)
 	hash := fmt.Sprintf("%x", bs)
 	heartModel := models.ReturnHearts{}
-	verifyheart := Db.Model(&heartModel).Where("sha = ? enc = ?", hash, info.Enc).First(&heartModel)
+	verifyheart := Db.Model(&heartModel).Where("sha = ? AND enc = ?", hash, info.Enc).First(&heartModel)
 	if verifyheart.Error != nil {
 		if errors.Is(verifyheart.Error, gorm.ErrRecordNotFound) {
 			c.JSON(http.StatusForbidden, gin.H{"error": "Invalid Heart Claim Request."})
@@ -467,7 +467,7 @@ func VerifyReturnHeart(c *gin.Context) {
 		return
 	}
 	var heartClaim models.HeartClaims
-	Db.Model(heartClaim).Where("sha = ?", hash).First(heartClaim)
+	Db.Model(heartClaim).Where("sha = ?", hash).First(&heartClaim)
 	userID, _ := c.Get("user_id")
 	returnHeartClaim := models.MatchTable{
 		Roll1: userID.(string),
