@@ -22,15 +22,22 @@ func PuppyRoute(r *gin.Engine, db db.PuppyDb) {
 	{
 		users.POST("/mail/:id", controllers.UserMail)
 		users.POST("/login/first", controllers.UserFirstLogin)
+		users.POST("/forgotpassword/:id", controllers.ForgotMail)
+		users.POST("/login/forgot", controllers.ForgotLogin)
 		users.Use(controllers.AuthenticateUser())
 		users.GET("/activeusers", controllers.GetActiveUsers)
 		users.GET("/fetchPublicKeys", controllers.FetchPublicKeys)
 		users.GET("/fetchReturnHearts", controllers.FetchReturnHearts)
+
+		//Api for verifying hearts that are fetched from Return Table
+		users.POST("/verifyreturnhearts", controllers.VerifyReturnHeart)
 		users.POST("/sendheartVirtual", controllers.SendHeartVirtual)
 		users.GET("/fetchall", controllers.FetchHearts)
 		users.POST("/sentHeartDecoded", controllers.SentHeartDecoded)
 		users.POST("/sendheart", controllers.SendHeart)
 		users.POST("/claimheart", controllers.HeartClaim)
+
+		//API for Last day login
 		users.POST("/publish", controllers.Publish)
 	}
 	late := r.Group("/special")

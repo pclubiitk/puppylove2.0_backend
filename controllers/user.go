@@ -83,6 +83,70 @@ func UserFirstLogin(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{"message": "User Created Successfully."})
 }
 
+func ForgotLogin(c *gin.Context) {
+	// User already authenticated in router.go by gin.HandlerFunc
+
+	// Validate the input format
+	info := new(models.TypeUserFirst)
+	if err := c.BindJSON(info); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Input data format."})
+		return
+	}
+
+	tempU := models.MailData{}
+	tempUser := models.User{}
+	tempRecord := Db.Model(&tempUser).Where("id = ?", info.Id).First(&tempU)
+	if tempRecord.Error != nil {
+		if errors.Is(tempRecord.Error, gorm.ErrRecordNotFound) {
+			c.JSON(http.StatusForbidden, gin.H{"error": "User not found !!"})
+			return
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Something went wrong, Please try again."})
+			return
+		}
+	}
+	// if info.AuthCode == " " {
+	// 	c.JSON(http.StatusBadRequest, gin.H{"error": "User already registered."})
+	// 	return
+	// }
+
+	// See U later ;) ...
+	user := models.User{}
+	publicK := Db.Model(&user).Where("pub_k = ?", info.PubKey).First(&user)
+	if publicK.Error == nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Please enter another public key !!"})
+		return
+	}
+
+	record := Db.Model(&user).Where("id = ? AND auth_c = ?", info.Id, info.AuthCode).First(&user)
+	if record.Error != nil {
+		if errors.Is(record.Error, gorm.ErrRecordNotFound) {
+			c.JSON(http.StatusForbidden, gin.H{"error": "Incorrect AuthCode entered !!"})
+			return
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Something went wrong, Please try again."})
+			return
+		}
+	}
+
+	// var newuser models.User
+	if err := record.Updates(models.User{
+		Id:     info.Id,
+		Pass:   info.PassHash,
+		PubK:   info.PubKey,
+		PrivK:  info.PrivKey,
+		AuthC:  " ",
+		Data:   info.Data,
+		Claims: "",
+		Dirty:  true,
+	}).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Something went wrong, Please try again."})
+		return
+	}
+
+	c.JSON(http.StatusCreated, gin.H{"message": "User Created Successfully."})
+}
+
 func SendHeart(c *gin.Context) {
 	// User already authenticated in router.go by gin.HandlerFunc
 
@@ -375,6 +439,9 @@ func GetActiveUsers(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"users": results})
 }
 
+/*
+This function would verify heart claims from returned table and would take care match logic adding matched rollno to matching table
+*/
 func VerifyReturnHeart(c *gin.Context) {
 	info := new(models.VerifyReturnHeartClaim)
 	if err := c.BindJSON(info); err != nil {
@@ -411,5 +478,4 @@ func VerifyReturnHeart(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusAccepted, gin.H{"message": "Heart Claim Success"})
-	return
 }

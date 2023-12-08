@@ -40,6 +40,11 @@ type VerifyHeartClaim struct {
 	GenderOfSender string `json:"genderOfSender" binding:"required"`
 }
 
+type VerifyReturnHeartClaim struct {
+	Enc    string `json:"enc"binding:"required"`
+	Secret string `json:"secret"binding:"required"`
+}
+
 type FetchHeartsFirst struct {
 	Enc            string `json:"enc"`
 	GenderOfSender string `json:"genderOfSender"`
