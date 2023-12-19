@@ -61,7 +61,7 @@ func UserLogout(c *gin.Context) {
 		Domain:   os.Getenv("domain"),
 		HttpOnly: true,
 		Secure:   false,
-		SameSite: http.SameSiteStrictMode,
+		SameSite: http.SameSiteNoneMode,
 	}
 
 	http.SetCookie(c.Writer, cookie)

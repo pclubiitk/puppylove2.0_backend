@@ -4,6 +4,7 @@ import (
 	"os"
 
 	// "github.com/gin-contrib/cors"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
@@ -24,9 +25,8 @@ func main() {
 	utils.Randinit()
 	store := cookie.NewStore([]byte(CfgAdminPass))
 	r := gin.Default()
+	r.Use(cors.New(cors.Config{AllowCredentials: true, AllowOrigins: []string{"http://localhost:3000"}, AllowHeaders: []string{"content-type"}}))
 	r.Use(sessions.Sessions("adminsession", store))
-	// r.Use(cors.Default())
-	r.Use(corsMiddleware())
 	router.PuppyRoute(r, *Db)
 
 	r.Run(":8080")
@@ -36,19 +36,19 @@ func main() {
 	// }
 }
 
-func corsMiddleware() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		c.Writer.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000") // Set the origin of your frontend app.
-		c.Writer.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE")
-		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+// func corsMiddleware() gin.HandlerFunc {
+// 	return func(c *gin.Context) {
+// 		c.Writer.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000") // Set the origin of your frontend app.
+// 		c.Writer.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE")
+// 		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
 
-		if c.Request.Method == "OPTIONS" {
-			c.Writer.Header().Set("Access-Control-Allow-Credentials", "true") // Allow credentials for preflight requests.
-			c.AbortWithStatus(204)
-			return
-		}
+// 		if c.Request.Method == "OPTIONS" {
+// 			c.Writer.Header().Set("Access-Control-Allow-Credentials", "true") // Allow credentials for preflight requests.
+// 			c.AbortWithStatus(204)
+// 			return
+// 		}
 
-		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true") // Allow credentials for the main request.
-		c.Next()
-	}
-}
+// 		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true") // Allow credentials for the main request.
+// 		c.Next()
+// 	}
+// }
