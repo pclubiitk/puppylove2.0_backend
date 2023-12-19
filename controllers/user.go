@@ -258,7 +258,8 @@ func SendHeart(c *gin.Context) {
 func SendHeartVirtual(c *gin.Context) {
 	info := new(models.SendHeartVirtual)
 	if err := c.BindJSON(info); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Input data format."})
+
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
