@@ -271,6 +271,11 @@ func SendHeartVirtual(c *gin.Context) {
 		return
 	}
 
+	if user.Submit {
+		c.JSON(http.StatusOK, gin.H{"error": "Hearts already sent."})
+		return
+	}
+
 	jsonData, err := json.Marshal(info.Hearts)
 	if err != nil {
 		return
