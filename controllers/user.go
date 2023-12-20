@@ -259,7 +259,7 @@ func SendHeartVirtual(c *gin.Context) {
 	info := new(models.SendHeartVirtual)
 	if err := c.BindJSON(info); err != nil {
 
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Wrong Format"})
 		return
 	}
 
@@ -268,6 +268,11 @@ func SendHeartVirtual(c *gin.Context) {
 	record := Db.Model(&user).Where("id = ?", userID).First(&user)
 	if record.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "User does not exist."})
+		return
+	}
+
+	if user.Submit {
+		c.JSON(http.StatusOK, gin.H{"error": "Hearts already sent."})
 		return
 	}
 

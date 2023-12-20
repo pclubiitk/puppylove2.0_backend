@@ -11,14 +11,14 @@ type Heart struct {
 }
 
 type Hearts struct {
-	Heart1 Heart `json:"heart1" binding:"required"`
+	Heart1 Heart `json:"heart1"`
 	Heart2 Heart `json:"heart2"`
 	Heart3 Heart `json:"heart3"`
 	Heart4 Heart `json:"heart4"`
 }
 
 type SendHeartVirtual struct {
-	Hearts Hearts `json:"hearts" binding:"required"`
+	Hearts Hearts `json:"hearts"`
 }
 
 type SendHeartFirst struct {
