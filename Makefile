@@ -2,9 +2,7 @@ run:
 	@go run main.go;\
 
 createDb:
-	@cd Stress\ test/;\
-	echo -e "adminID\nadminPASS" | python3 populate.py;\
-	cd ..;\
+	@cd ./Stress\ test/ && echo "adminID\nadminPASS" | python3 populate.py;\
 
 deleteDb:
 	@psql puppylove -c "delete from users;";\

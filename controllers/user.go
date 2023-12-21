@@ -485,3 +485,33 @@ func VerifyReturnHeart(c *gin.Context) {
 	}
 	c.JSON(http.StatusAccepted, gin.H{"message": "Heart Claim Success"})
 }
+
+func MatchesHandler(c *gin.Context) {
+	if models.PublishMatches {
+		results := []string{}
+		userID, _ := c.Get("user_id")
+		var user models.User
+
+		Db.Model(&user).Where("id=?", userID).First(&user)
+
+		if !user.Publish {
+			c.JSON(http.StatusOK, gin.H{"msg": "You choose not to publish results"})
+			return
+		}
+
+		var matches []models.MatchTable
+		var matchDb models.MatchTable
+		Db.Model(&matchDb).Where("roll1 = ?", userID).Find(&matches)
+		for _, match := range matches {
+			var user2 models.User
+			Db.Model(&user2).Where("id=?", match.Roll2).First(&user2)
+			if user2.Publish {
+				results = append(results, match.Roll2)
+			}
+		}
+		c.JSON(http.StatusOK, gin.H{"matches": results})
+		return
+
+	}
+	c.JSON(http.StatusOK, gin.H{"msg": "Matches not yet published"})
+}

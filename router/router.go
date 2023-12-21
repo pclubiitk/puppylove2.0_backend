@@ -39,6 +39,7 @@ func PuppyRoute(r *gin.Engine, db db.PuppyDb) {
 
 		//API for Last day login
 		users.POST("/publish", controllers.Publish)
+		users.GET("/mymatches", controllers.MatchesHandler)
 	}
 	late := r.Group("/special")
 	{
@@ -62,6 +63,7 @@ func PuppyRoute(r *gin.Engine, db db.PuppyDb) {
 		admin.GET("/user/deleteallusers", controllers.DeleteAllUsers)
 		admin.POST("/user/new", controllers.AddNewUser)
 		admin.POST("/user/delete", controllers.DeleteUser)
+		admin.GET("/publish", controllers.PublishResults)
 	}
 
 }
