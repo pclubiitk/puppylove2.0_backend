@@ -4,6 +4,9 @@ all:
 createDb:
 	@cd ./Stress\ test/ && echo "adminID\nadminPASS" | python3 populate.py;\
 
+publishResult:
+	@cd ./test_suite && echo "adminID\nadminPASS" | python3 publish.py;\
+
 deleteDb:
 	@psql puppylove -c "delete from users;";\
 	psql puppylove -c "delete from send_hearts;";\
