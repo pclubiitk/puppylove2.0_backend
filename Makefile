@@ -1,4 +1,4 @@
-run:
+all:
 	@go run main.go;\
 
 createDb:
