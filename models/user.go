@@ -4,6 +4,8 @@ import (
 	"gorm.io/gorm"
 )
 
+var PublishMatches = false
+
 type (
 	// User represents the structure of our resource
 	User struct {

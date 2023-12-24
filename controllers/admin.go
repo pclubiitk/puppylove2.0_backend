@@ -132,3 +132,12 @@ func DeleteAllUsers(c *gin.Context) {
 
 	c.JSON(http.StatusCreated, gin.H{"message": "All Users Deleted successfully."})
 }
+
+func PublishResults(c *gin.Context) {
+	if !models.PublishMatches {
+		models.PublishMatches = true
+		c.JSON(http.StatusOK, gin.H{"msg": "Published Matches"})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"msg": "Matches already published"})
+}

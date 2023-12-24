@@ -41,8 +41,8 @@ type VerifyHeartClaim struct {
 }
 
 type VerifyReturnHeartClaim struct {
-	Enc    string `json:"enc"binding:"required"`
-	Secret string `json:"secret"binding:"required"`
+	Enc    string `json:"enc" binding:"required"`
+	Secret string `json:"secret" binding:"required"`
 }
 
 type FetchHeartsFirst struct {
