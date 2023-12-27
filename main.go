@@ -2,7 +2,7 @@ package main
 
 import (
 	"os"
-
+	
 	// "github.com/gin-contrib/cors"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/sessions"
@@ -19,7 +19,7 @@ func main() {
 	if err := godotenv.Load(); err != nil {
 		panic("Error loading .env file")
 	}
-	var CfgAdminPass = os.Getenv("CfgAdminPass")
+	var CfgAdminPass = os.Getenv("CFG_ADMIN_PASS")
 	Db := db.InitDB()
 
 	utils.Randinit()

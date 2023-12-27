@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: db-core-deployment
+  labels:
+    app: db-core
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: db-core
+  template:
+    metadata:
+      labels:
+        app: db-core
+    spec:
+      containers:
+        - name: db-core
+          image: postgres
+          volumeMounts:
+            - name: db-core-persistent-storage
+              mountPath: /var/lib/postgresql/data
+          env:
+          - name: POSTGRES_DB
+            value: "puppylove"
+          - name: POSTGRES_USER
+            value: "postgres"
+          - name: POSTGRES_PASSWORD
+            value: "postgres"
+      volumes:
+        - name: db-core-persistent-storage
+          persistentVolumeClaim:
+            claimName: db-core-pvc

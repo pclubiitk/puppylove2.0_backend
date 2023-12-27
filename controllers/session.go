@@ -42,7 +42,7 @@ func UserLogin(c *gin.Context) {
 		Value:    token,
 		Expires:  expirationTime,
 		Path:     "/",
-		Domain:   os.Getenv("domain"),
+		Domain:   os.Getenv("DOMAIN"),
 		HttpOnly: true,
 		Secure:   false, // Set this to true if you're using HTTPS, false for HTTP
 		SameSite: http.SameSiteStrictMode,
@@ -58,7 +58,7 @@ func UserLogout(c *gin.Context) {
 		Value:    "",
 		Expires:  time.Now().Add(-time.Hour), // Expire the cookie immediately
 		Path:     "/",
-		Domain:   os.Getenv("domain"),
+		Domain:   os.Getenv("DOMAIN"),
 		HttpOnly: true,
 		Secure:   false,
 		SameSite: http.SameSiteNoneMode,
@@ -82,7 +82,7 @@ type HeartClaims struct {
 }
 
 func generateJWTToken(userID string) (string, error) {
-	var jwtSigningKey = os.Getenv("UserjwtSigningKey")
+	var jwtSigningKey = os.Getenv("USER_JWT_SIGNING_KEY")
 	claims := AuthClaims{
 		userID,
 		jwt.StandardClaims{
@@ -96,7 +96,7 @@ func generateJWTToken(userID string) (string, error) {
 }
 
 func generateJWTTokenForHeartBack(userID string) (string, error) {
-	var heartjwtSigningKey = os.Getenv("HeartjwtSigningKey")
+	var heartjwtSigningKey = os.Getenv("HEART_JWT_SIGNING_KEY")
 	verified := "Absolutely"
 	claims := HeartClaims{
 		userID,

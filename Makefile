@@ -3,7 +3,7 @@ all:
 
 createDb:
 	@cd ./Stress\ test/ && echo "adminID\nadminPASS" | python3 populate.py;\
-
+te
 publishResult:
 	@cd ./test_suite && echo "adminID\nadminPASS" | python3 publish.py;\
 

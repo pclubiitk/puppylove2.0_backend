@@ -16,11 +16,15 @@ type PuppyDb struct {
 }
 
 func InitDB() *PuppyDb {
-	host := os.Getenv("host")
-	port := os.Getenv("port")
-	password := os.Getenv("password")
-	dbName := os.Getenv("dbName")
-	user := os.Getenv("user")
+	host := os.Getenv("POSTGRES_HOST")
+	port := os.Getenv("POSTGRES_PORT")
+	password := os.Getenv("POSTGRES_PASSWORD")
+	dbName := os.Getenv("POSTGRES_DB")
+	user := os.Getenv("POSTGRES_USER")
+
+	// if os.Getenv(keyDocker)=""{
+	// 	host = "localhost"
+	// }
 
 	loginstring := fmt.Sprintf("host=%s user=%s  password=%s dbname=%s port=%s sslmode=disable TimeZone=Asia/Kolkata", host, user, password, dbName, port)
 

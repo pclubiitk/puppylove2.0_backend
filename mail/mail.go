@@ -9,8 +9,8 @@ import (
 
 func SendMail(name string, to string, authCode string) error {
 
-	from := os.Getenv("EMAILID")
-	password := os.Getenv("EMAILPASS")
+	from := os.Getenv("EMAIL_ID")
+	password := os.Getenv("EMAIL_PASS")
 
 	// 	// smtp server configuration.
 	smtpHost := "mmtp.iitk.ac.in"

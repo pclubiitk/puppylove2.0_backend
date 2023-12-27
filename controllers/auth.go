@@ -11,7 +11,7 @@ import (
 
 func AuthenticateAdmin() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var jwtSigningKey = os.Getenv("UserjwtSigningKey")
+		var jwtSigningKey = os.Getenv("USER_JWT_SIGNING_KEY")
 		authCookie, err := c.Cookie("Authorization")
 		if err != nil {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Authorization cookie missing"})
@@ -35,7 +35,7 @@ func AuthenticateAdmin() gin.HandlerFunc {
 
 		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 			userID := claims["user_id"].(string)
-			if userID != os.Getenv("AdminId") {
+			if userID != os.Getenv("ADMIN_ID") {
 				unauthorizedMessage := fmt.Sprintf("Unauthorized Login attempt by %s, it will be recorded.", userID)
 				log.Println(unauthorizedMessage)
 				c.JSON(http.StatusUnauthorized, gin.H{"error": unauthorizedMessage})
@@ -51,7 +51,7 @@ func AuthenticateAdmin() gin.HandlerFunc {
 
 func AuthenticateUser() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var jwtSigningKey = os.Getenv("UserjwtSigningKey")
+		var jwtSigningKey = os.Getenv("USER_JWT_SIGNING_KEY")
 		authCookie, err := c.Cookie("Authorization")
 		if err != nil {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Authorization cookie missing"})
@@ -75,7 +75,7 @@ func AuthenticateUser() gin.HandlerFunc {
 
 		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 			userID := claims["user_id"].(string)
-			if userID == os.Getenv("AdminId") {
+			if userID == os.Getenv("ADMIN_ID") {
 				c.JSON(http.StatusUnauthorized, gin.H{"error": "You Serious ?? , login using Postman or CLI, the frontend is only for normal users."})
 				c.Abort()
 			}
@@ -90,7 +90,7 @@ func AuthenticateUser() gin.HandlerFunc {
 
 func AuthenticateUserHeartclaim() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var heartjwtSigningKey = os.Getenv("HeartjwtSigningKey")
+		var heartjwtSigningKey = os.Getenv("HEART_JWT_SIGNING_KEY")
 		useridfromJWT, _ := c.Get("user_id")
 		heartCookie, err := c.Cookie("HeartBack")
 		if err != nil {

@@ -18,3 +18,30 @@ domain = localhost
 
 EMAILID="hello@iitk.ac.in"
 EMAILPASS="hello"
+
+# For Windows Dev users, install postgres & use net stop/start postgresql-x64-15
+# host = 34.66.212.139
+# port = 5432
+# password = 'pclubiitk'
+# dbName = puppylove
+# user = postgres
+# CfgAdminPass = something
+
+# host = db-core
+# port = 5432
+# password = postgres
+# dbName = puppylove
+# user = postgres
+# CfgAdminPass = something
+
+# AdminId = admin
+# AdminPass = admin
+
+# # Make sure both are different
+# UserjwtSigningKey = "something"
+# HeartjwtSigningKey = "something2"
+# domain = localhost
+
+
+# EMAILID="hello@iitk.ac.in"
+# EMAILPASS="hello"

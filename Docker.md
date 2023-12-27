@@ -3,7 +3,7 @@
 First of all, format the `.env` file as below.
 
 ```.env
-host = host.docker.internal
+host = localhost
 port = 5432
 password = "dbpass"
 dbName = postgres
@@ -28,8 +28,7 @@ After doing above changes. Run the below commands in your terminal.
 
 ```bash
 // Build docker image
-docker build . -t <your username>/absurd-agent
+docker build -t puppylove .
 
 // Run the docker image
-docker run -p 8000:8000 -d <your username>/absurd-agent
-```
+docker run -p 8080:8080 --network host puppylove
