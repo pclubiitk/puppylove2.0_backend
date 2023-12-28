@@ -3,10 +3,12 @@ kind: Service
 metadata:
   name: backend-core
 spec:
+  ports:
+    - port: 8080
+      protocol: TCP
+      targetPort: 8080
+      nodePort: 30100
   selector:
     app: backend-core
-  ports:
-    - name: backend-core-port
-      port: 8080
-      nodePort: 30100
+  sessionAffinity: None
   type: NodePort
