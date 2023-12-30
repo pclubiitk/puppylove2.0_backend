@@ -25,7 +25,7 @@ func main() {
 	utils.Randinit()
 	store := cookie.NewStore([]byte(CfgAdminPass))
 	r := gin.Default()
-	r.Use(cors.New(cors.Config{AllowCredentials: true, AllowOrigins: []string{"http://localhost:3000"}, AllowHeaders: []string{"content-type"}}))
+	r.Use(cors.New(cors.Config{AllowCredentials: true, AllowOrigins: []string{"*"}, AllowHeaders: []string{"content-type"}}))
 	r.Use(sessions.Sessions("adminsession", store))
 	router.PuppyRoute(r, *Db)
 
