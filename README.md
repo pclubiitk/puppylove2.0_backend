@@ -17,19 +17,22 @@ Depending on the authentication details you've set up modify the `.env` file(ref
 > Format of the .env file -- Don't forget to disable SSL if not already.
 
 ```
-host = localhost
-port = 5432
-password = 'password'
-dbName = postgres
-user = postgres
-CfgAdminPass = something
+POSTGRES_HOST = localhost
+POSTGRES_PORT = 5433
+POSTGRES_PASSWORD = admin
+POSTGRES_DB = puppylove
+POSTGRES_USER = pratham
+CFG_ADMIN_PASS = "something"
 
-AdminId = may_be_aleatoryfreak
-AdminPass = you_can_just_guess_it
+ADMIN_ID = "admin"
+ADMIN_PASS = "admin"
 
-# Make sure both are different
-UserjwtSigningKey = "something"
-HeartjwtSigningKey = "something2"
+USER_JWT_SIGNING_KEY = "something"
+HEART_JWT_SIGNING_KEY = "something2"
+DOMAIN = "localhost"
+
+EMAIL_ID = "hello@iitk.ac.in"
+EMAIL_PASS = "hello"
 ``` 
 
 Build the app by using `go mod build` & then run `./me-my_encryption` (the generated file).
@@ -37,6 +40,10 @@ OR you may directly run the main.go file as well.
 
 Server should be up & listening at port 8080.
 
+### Deploying the backend and database
+
+For deployment we have chosen to go with a Kubernetes cluster as it is easily scalable and crashes of the backend, do not affect the state of the database.
+For deploying a server, kindly see `DEPLOYMENT.md`.
 
 ## About the Algorithm (I'll try eplaining better when I get time)
 

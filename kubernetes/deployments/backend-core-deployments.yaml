@@ -15,7 +15,9 @@ spec:
     spec:
       containers:
         - name: backend-core
-          image: prathamsahu52/backend-puppylove:1.0.3
+          image: prathamsahu52/backend-puppylove:1.0.4
+          ports:
+            - containerPort: 8000
           envFrom:
           - configMapRef:
               name: backend-core-config

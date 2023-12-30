@@ -3,23 +3,9 @@ kind: PersistentVolumeClaim
 metadata:
   name: db-core-pvc
 spec:
-  storageClassName: localstorage
+  storageClassName: gold
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
       storage: 5Gi
----
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: db-core-pv
-spec:
-  storageClassName: localstorage
-  capacity:
-    storage: 5Gi
-  accessModes:
-    - ReadWriteOnce
-  hostPath:
-    path: "/mnt/some new/directory/structure/"
-    type: DirectoryOrCreate

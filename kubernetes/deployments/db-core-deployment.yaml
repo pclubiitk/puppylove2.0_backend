@@ -14,12 +14,16 @@ spec:
       labels:
         app: db-core
     spec:
+      volumes:
+        - name: db-core-persistent-storage
+          persistentVolumeClaim:
+            claimName: db-core-pvc    
       containers:
         - name: db-core
           image: postgres
           volumeMounts:
             - name: db-core-persistent-storage
-              mountPath: /var/lib/postgresql/data
+              mountPath: /var/lib/postgresql/puppylove_data
           env:
           - name: POSTGRES_DB
             value: "puppylove"
@@ -27,7 +31,5 @@ spec:
             value: "postgres"
           - name: POSTGRES_PASSWORD
             value: "postgres"
-      volumes:
-        - name: db-core-persistent-storage
-          persistentVolumeClaim:
-            claimName: db-core-pvc
+          ports:
+            - containerPort: 5432
