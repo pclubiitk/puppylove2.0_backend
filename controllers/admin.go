@@ -20,12 +20,12 @@ func AdminLogin(c *gin.Context) {
 		return
 	}
 
-	if info.Id != os.Getenv("AdminId") {
+	if info.Id != os.Getenv("ADMIN_ID") {
 		c.JSON(http.StatusForbidden, gin.H{"error": "This action will be reported."})
 		return
 	}
 
-	if info.Pass != os.Getenv("AdminPass") {
+	if info.Pass != os.Getenv("ADMIN_PASS") {
 		c.JSON(http.StatusForbidden, gin.H{"error": "Invalid Password."})
 		return
 	}
@@ -41,7 +41,7 @@ func AdminLogin(c *gin.Context) {
 		Value:    token,
 		Expires:  expirationTime,
 		Path:     "/",
-		Domain:   os.Getenv("domain"),
+		Domain:   os.Getenv("DOMAIN"),
 		HttpOnly: true,
 		Secure:   false, // Set this to true if you're using HTTPS, false for HTTP
 		SameSite: http.SameSiteStrictMode,

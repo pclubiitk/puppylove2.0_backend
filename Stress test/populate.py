@@ -10,7 +10,7 @@ headers = {
     'Content-Type': 'application/json',
 }
 
-url = "http://127.0.0.1:8080/session/admin/login"
+url = "http://34.126.146.242:30100/session/admin/login"
 payload = json.dumps(data)
 authdata = json.dumps({
     "id":adminid,
@@ -23,7 +23,7 @@ headers_with_cookie = {
     'Content-Type': 'application/json',
     'Cookie': cookie
 }
-addUrl = "http://127.0.0.1:8080/admin/user/new"
+addUrl = "http://34.126.146.242:30100/admin/user/new"
 
 response = session.post(addUrl,headers=headers_with_cookie,data=payload)
 print(response.json())

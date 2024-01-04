@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-core-deployment
+  labels:
+    app: backend-core
+spec:
+  selector:
+    matchLabels:
+      app: backend-core
+  template:
+    metadata:
+      labels:
+        app: backend-core
+    spec:
+      containers:
+        - name: backend-core
+          image: prathamsahu52/backend-puppylove:1.0.4
+          ports:
+            - containerPort: 8000
+          envFrom:
+          - configMapRef:
+              name: backend-core-config

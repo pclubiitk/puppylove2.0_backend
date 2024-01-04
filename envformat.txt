@@ -1,20 +1,18 @@
-# For Windows Dev users, install postgres & use net stop/start postgresql-x64-15
+Format:
 
-host = localhost
-port = 5432
-password = "password"
-dbName = postgres
-user = postgres
-CfgAdminPass = something
+POSTGRES_HOST = localhost
+POSTGRES_PORT = 5433
+POSTGRES_PASSWORD = admin
+POSTGRES_DB = puppylove
+POSTGRES_USER = pratham
+CFG_ADMIN_PASS = "something"
 
-AdminId = may_be_aleatoryfreak
-AdminPass = you_can_just_guess_it
+ADMIN_ID = "admin"
+ADMIN_PASS = "admin"
 
-# Make sure both are different
-UserjwtSigningKey = "something"
-HeartjwtSigningKey = "something2"
-domain = localhost
+USER_JWT_SIGNING_KEY = "something"
+HEART_JWT_SIGNING_KEY = "something2"
+DOMAIN = "localhost"
 
-
-EMAILID="hello@iitk.ac.in"
-EMAILPASS="hello"
+EMAIL_ID = "hello@iitk.ac.in"
+EMAIL_PASS = "hello"

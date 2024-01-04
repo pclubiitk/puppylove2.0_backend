@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backend-core-config
+data:
+  POSTGRES_HOST : "db-core"
+  POSTGRES_PORT : "5432"
+  POSTGRES_PASSWORD : "postgres"
+  POSTGRES_DB : "puppylove"
+  POSTGRES_USER : "postgres"
+  CFG_ADMIN_PASS : "something"
+
+  ADMIN_ID : "admin1"
+  ADMIN_PASS : "admin2"
+
+  USER_JWT_SIGNING_KEY : "something"
+  HEART_JWT_SIGNING_KEY : "something2"
+  DOMAIN : "localhost"
+
+  EMAIL_ID : "hello@iitk.ac.in"
+  EMAIL_PASS : "hello"

@@ -1,18 +1,17 @@
+FROM ubuntu:20.04 AS base-stage
+
 FROM golang:1.21 AS build-stage
 
 WORKDIR /app
 COPY . .
-RUN go mod download
+RUN go mod tidy
 RUN CGO_ENABLED=0 GOOS=linux go build -o /pupplovebackend
 
-FROM gcr.io/distroless/base-debian11 AS build-release-stage
-
-WORKDIR /
+FROM base-stage AS final-stage
 COPY --from=build-stage /pupplovebackend /pupplovebackend
-COPY ./.env .env
-
+COPY --from=build-stage /app/.env /.env
 EXPOSE 8080
-USER nonroot:nonroot
-
-ENTRYPOINT [ "/pupplovebackend" ]
-
+ENV PORT 8080
+# set hostname to localhost
+ENV HOSTNAME "0.0.0.0"
+ENTRYPOINT ["./pupplovebackend"]

@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: db-core
+spec:
+  ports:
+    - port: 5432
+      protocol: TCP
+      targetPort: 5432
+      nodePort: 30200
+  selector:
+    app: db-core
+  sessionAffinity: None
+  type: NodePort
