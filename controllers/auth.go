@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"
 )
@@ -133,6 +134,17 @@ func AuthenticateUserHeartclaim() gin.HandlerFunc {
 			c.Next()
 		} else {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token claims"})
+			c.Abort()
+		}
+	}
+}
+
+func AdminPermit() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		if permit {
+			c.Next()
+		} else {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Not Permitted by Admin"})
 			c.Abort()
 		}
 	}
