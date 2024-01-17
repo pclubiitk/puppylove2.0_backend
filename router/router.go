@@ -65,4 +65,10 @@ func PuppyRoute(r *gin.Engine, db db.PuppyDb) {
 		admin.GET("/publish", controllers.PublishResults)
 	}
 
+	//stats
+	stats := r.Group("/stats")
+	{
+		stats.GET("/", controllers.GetStats)
+	}
+
 }
