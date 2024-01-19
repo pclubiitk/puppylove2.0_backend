@@ -5,9 +5,9 @@ import (
 )
 
 type Heart struct {
-	ENC        string `json:"enc"`
-	SHA        string `json:"sha"`
-	Id_encrypt string `json:"id_encrypt"`
+	ENC         string `json:"enc"`
+	SHA_encrypt string `json:"sha_encrypt"`
+	Id_encrypt  string `json:"id_encrypt"`
 }
 
 type Hearts struct {
