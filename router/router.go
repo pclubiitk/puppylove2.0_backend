@@ -70,4 +70,10 @@ func PuppyRoute(r *gin.Engine, db db.PuppyDb) {
 		admin.GET("/TogglePermit", controllers.TogglePermit)
 	}
 
+	//stats
+	stats := r.Group("/stats")
+	{
+		stats.GET("/", controllers.GetStats)
+	}
+
 }
