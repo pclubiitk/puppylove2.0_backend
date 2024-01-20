@@ -142,75 +142,83 @@ func ForgotMail(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Auth. code sent successfully !!"})
 }
 
+var femaleRegisters = 0
+var maleRegisters = 0
+var registers = struct {
+	y19 int
+	y20 int
+	y21 int
+	y22 int
+	y23 int
+}{y19: 0, y20: 0, y21: 0, y22: 0, y23: 0}
+var numberOfMatches = 0
+var batchwiseMatches = struct {
+	y19 int
+	y20 int
+	y21 int
+	y22 int
+	y23 int
+}{y19: 0, y20: 0, y21: 0, y22: 0, y23: 0}
+
 func GetStats(c *gin.Context) {
-	var userdb models.User
-	var users []models.User
-
-	records := Db.Model(&userdb).Where("dirty = ?", true).Find(&users)
-	if records.Error != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error Fetching Stats"})
+	if !models.PublishMatches {
+		c.JSON(http.StatusOK, gin.H{"msg": "Stats Not yet published"})
 		return
 	}
+	if maleRegisters+femaleRegisters == 0 {
+		var userdb models.User
+		var users []models.User
 
-	var matchdb models.MatchTable
-	var matches []models.MatchTable
-
-	records = Db.Model(&matchdb).Where("").Find(&matches)
-	if records.Error != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error Fetching Stats"})
-		return
-	}
-	femaleRegisters := 0
-	maleRegisters := 0
-	registers := struct {
-		y19 int
-		y20 int
-		y21 int
-		y22 int
-		y23 int
-	}{y19: 0, y20: 0, y21: 0, y22: 0, y23: 0}
-	numberOfMatches := int(len(matches) / 2)
-	batchwiseMatches := struct {
-		y19 int
-		y20 int
-		y21 int
-		y22 int
-		y23 int
-	}{y19: 0, y20: 0, y21: 0, y22: 0, y23: 0}
-	for _, user := range users {
-		if user.Gender == "M" {
-			maleRegisters++
-		} else {
-			femaleRegisters++
+		records := Db.Model(&userdb).Where("dirty = ?", true).Find(&users)
+		if records.Error != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Error Fetching Stats"})
+			return
 		}
-		startstring := user.Id[0:2]
-		switch startstring {
-		case "19":
-			registers.y19++
-		case "20":
-			registers.y20++
-		case "21":
-			registers.y21++
-		case "22":
-			registers.y22++
-		case "23":
-			registers.y23++
-		}
-	}
 
-	for _, matc := range matches {
-		startstr := matc.Roll1[0:2]
-		switch startstr {
-		case "19":
-			batchwiseMatches.y19++
-		case "20":
-			batchwiseMatches.y20++
-		case "21":
-			batchwiseMatches.y21++
-		case "22":
-			batchwiseMatches.y22++
-		case "23":
-			batchwiseMatches.y23++
+		var matchdb models.MatchTable
+		var matches []models.MatchTable
+		numberOfMatches = int(len(matches) / 2)
+
+		records = Db.Model(&matchdb).Where("").Find(&matches)
+		if records.Error != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Error Fetching Stats"})
+			return
+		}
+		for _, user := range users {
+			if user.Gender == "M" {
+				maleRegisters++
+			} else {
+				femaleRegisters++
+			}
+			startstring := user.Id[0:2]
+			switch startstring {
+			case "19":
+				registers.y19++
+			case "20":
+				registers.y20++
+			case "21":
+				registers.y21++
+			case "22":
+				registers.y22++
+			case "23":
+				registers.y23++
+			}
+		}
+
+		for _, matc := range matches {
+			startstr := matc.Roll1[0:2]
+			switch startstr {
+			case "19":
+				batchwiseMatches.y19++
+			case "20":
+				batchwiseMatches.y20++
+			case "21":
+				batchwiseMatches.y21++
+			case "22":
+				batchwiseMatches.y22++
+			case "23":
+				batchwiseMatches.y23++
+			}
 		}
 	}
 
