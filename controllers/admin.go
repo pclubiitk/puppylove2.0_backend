@@ -12,6 +12,7 @@ import (
 )
 
 var Db db.PuppyDb
+var permit bool = true
 
 func AdminLogin(c *gin.Context) {
 	info := new(models.AdminLogin)
@@ -140,4 +141,9 @@ func PublishResults(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"msg": "Matches already published"})
+}
+
+func TogglePermit(c *gin.Context) {
+	permit = !permit
+	c.JSON(http.StatusOK, gin.H{"permitStatus": permit})
 }

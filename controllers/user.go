@@ -359,6 +359,10 @@ func ReturnClaimedHeartLate(c *gin.Context) {
 }
 
 func Publish(c *gin.Context) {
+	if models.PublishMatches {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Results Published"})
+		return
+	}
 	userID, _ := c.Get("user_id")
 	var user models.User
 	record := Db.Model(&user).Where("id = ?", userID).Update("Publish", true)
@@ -442,6 +446,7 @@ func VerifyReturnHeart(c *gin.Context) {
 
 func MatchesHandler(c *gin.Context) {
 	if models.PublishMatches {
+
 		results := []string{}
 		userID, _ := c.Get("user_id")
 		var user models.User
