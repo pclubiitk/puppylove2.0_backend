@@ -49,7 +49,7 @@ func UserLogin(c *gin.Context) {
 	}
 
 	http.SetCookie(c.Writer, cookie)
-	c.JSON(http.StatusOK, gin.H{"message": "User logged in successfully !!", "data": loginmodel.Data, "pvtKey_Enc": loginmodel.PrivK, "pubKey": loginmodel.PubK, "gender": loginmodel.Gender, "submit": loginmodel.Submit, "claims": loginmodel.Claims})
+	c.JSON(http.StatusOK, gin.H{"message": "User logged in successfully !!", "data": loginmodel.Data, "pvtKey_Enc": loginmodel.PrivK, "pubKey": loginmodel.PubK, "gender": loginmodel.Gender, "submit": loginmodel.Submit, "claims": loginmodel.Claims, "permit": permit, "publish": loginmodel.Publish})
 }
 
 func UserLogout(c *gin.Context) {

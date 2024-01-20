@@ -29,19 +29,23 @@ func PuppyRoute(r *gin.Engine, db db.PuppyDb) {
 
 		//Api for verifying hearts that are fetched from Return Table
 		users.POST("/verifyreturnhearts", controllers.VerifyReturnHeart)
-		users.POST("/sendheartVirtual", controllers.SendHeartVirtual)
 		users.GET("/fetchall", controllers.FetchHearts)
 		users.POST("/sentHeartDecoded", controllers.SentHeartDecoded)
-		users.POST("/sendheart", controllers.SendHeart)
 		users.POST("/claimheart", controllers.HeartClaim)
 
 		//API for Last day login
 		users.POST("/publish", controllers.Publish)
 		users.GET("/mymatches", controllers.MatchesHandler)
+
+		//Send Heart Routes Allowed Only if Admin Permits
+		users.Use(controllers.AdminPermit())
+		users.POST("/sendheartVirtual", controllers.SendHeartVirtual)
+		users.POST("/sendheart", controllers.SendHeart)
 	}
 	late := r.Group("/special")
 	{
 		late.Use(controllers.AuthenticateUser())
+		users.Use(controllers.AdminPermit())
 		// late.Use(controllers.AuthenticateUserHeartclaim())
 		late.POST("/returnclaimedheartlate", controllers.ReturnClaimedHeartLate)
 	}
@@ -62,6 +66,7 @@ func PuppyRoute(r *gin.Engine, db db.PuppyDb) {
 		admin.POST("/user/new", controllers.AddNewUser)
 		admin.POST("/user/delete", controllers.DeleteUser)
 		admin.GET("/publish", controllers.PublishResults)
+		admin.GET("/TogglePermit", controllers.TogglePermit)
 	}
 
 	//stats
