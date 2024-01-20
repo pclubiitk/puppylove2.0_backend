@@ -2,10 +2,10 @@ all:
 	@go run main.go;\
 
 createDb:
-	@cd ./Stress\ test/ && echo "adminID\nadminPASS" | python3 populate.py;\
+	@cd ./test_suite && python3 populate.py;\
 
 publishResult:
-	@cd ./test_suite && echo "adminID\nadminPASS" | python3 publish.py;\
+	@cd ./test_suite && python3 publish.py;\
 
 deleteDb:
 	@psql puppylove -c "delete from users;";\

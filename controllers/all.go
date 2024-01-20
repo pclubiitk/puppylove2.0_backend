@@ -118,30 +118,6 @@ func UserMail(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Auth. code sent successfully !!"})
 }
 
-func ForgotMail(c *gin.Context) {
-	id := c.Param("id")
-	u := models.MailData{}
-	user := models.User{}
-	record := Db.Model(&user).Where("id = ?", id).First(&u)
-	if record.Error != nil {
-		if errors.Is(record.Error, gorm.ErrRecordNotFound) {
-			c.JSON(http.StatusForbidden, gin.H{"error": "User not found !!"})
-			return
-		} else {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Something went wrong, Please try again."})
-			return
-		}
-	}
-
-	AuthC := utils.RandStringRunes(15)
-	Db.Model(&user).Where("id = ?", id).Update("AuthC", AuthC)
-	if mail.SendMail(u.Name, u.Email, AuthC) != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Something went wrong, Please try again."})
-		return
-	}
-	c.JSON(http.StatusOK, gin.H{"message": "Auth. code sent successfully !!"})
-}
-
 var femaleRegisters = 0
 var maleRegisters = 0
 var registers = struct {

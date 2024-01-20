@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -415,14 +416,43 @@ func VerifyReturnHeart(c *gin.Context) {
 	var heartClaim models.HeartClaims
 	Db.Model(heartClaim).Where("sha = ?", hash).First(&heartClaim)
 	userID, _ := c.Get("user_id")
-	returnHeartClaim := models.MatchTable{
-		Roll1: userID.(string),
-		Roll2: heartClaim.Roll,
+	roll1 := userID.(string)
+	roll2 := heartClaim.Roll
+
+	userdb := models.User{}
+	userdb1 := models.User{}
+
+	Db.First(&userdb, "id = ", roll1)
+	userdb.Matches = userdb.Matches + "," + roll2
+	Db.Save(&userdb)
+
+	Db.First(&userdb1, "id = ", roll2)
+	userdb1.Matches = userdb1.Matches + "," + roll1
+	Db.Save(&userdb1)
+
+	temp1, _ := strconv.Atoi(userID.(string))
+	temp2, _ := strconv.Atoi(heartClaim.Roll)
+
+	if temp1 < temp2 {
+		returnHeartClaim := models.MatchTable{
+			Roll1: userID.(string),
+			Roll2: heartClaim.Roll,
+		}
+		if err := Db.Create(&returnHeartClaim).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+			return
+		}
+	} else if temp2 < temp1 {
+		returnHeartClaim := models.MatchTable{
+			Roll2: userID.(string),
+			Roll1: heartClaim.Roll,
+		}
+		if err := Db.Create(&returnHeartClaim).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+			return
+		}
 	}
-	if err := Db.Create(&returnHeartClaim).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
-		return
-	}
+
 	c.JSON(http.StatusAccepted, gin.H{"message": "Heart Claim Success"})
 }
 
