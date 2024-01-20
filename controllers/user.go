@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -411,12 +412,29 @@ func VerifyReturnHeart(c *gin.Context) {
 	var heartClaim models.HeartClaims
 	Db.Model(heartClaim).Where("sha = ?", hash).First(&heartClaim)
 	userID, _ := c.Get("user_id")
-	returnHeartClaim := models.MatchTable{
-		Roll1: userID.(string),
-		Roll2: heartClaim.Roll,
-	}
-	if err := Db.Create(&returnHeartClaim).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+	temproll1 := userID.(int)
+	temproll2, _ := strconv.Atoi(heartClaim.Roll)
+	fmt.Print(temproll1, temproll2)
+	if temproll1 < temproll2 {
+		returnHeartClaim := models.MatchTable{
+			Roll1: userID.(string),
+			Roll2: heartClaim.Roll,
+		}
+		if err := Db.Create(&returnHeartClaim).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+			return
+		}
+	} else if temproll2 < temproll1 {
+		returnHeartClaim := models.MatchTable{
+			Roll2: userID.(string),
+			Roll1: heartClaim.Roll,
+		}
+		if err := Db.Create(&returnHeartClaim).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+			return
+		}
+	} else {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Some Error at Frontend"})
 		return
 	}
 	c.JSON(http.StatusAccepted, gin.H{"message": "Heart Claim Success"})
