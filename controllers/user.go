@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -416,41 +416,49 @@ func VerifyReturnHeart(c *gin.Context) {
 	var heartClaim models.HeartClaims
 	Db.Model(heartClaim).Where("sha = ?", hash).First(&heartClaim)
 	userID, _ := c.Get("user_id")
-	roll1 := userID.(string)
-	roll2 := heartClaim.Roll
+	// roll1 := userID.(string)
+	// roll2 := heartClaim.Roll
 
-	userdb := models.User{}
-	userdb1 := models.User{}
+	// userdb := models.User{}
+	// Db.Model(&userdb).Where("id = ?", roll1).First(&userdb)
+	// userdb.Matches = userdb.Matches + "," + roll2
+	// Db.Save(&userdb)
 
-	Db.First(&userdb, "id = ", roll1)
-	userdb.Matches = userdb.Matches + "," + roll2
-	Db.Save(&userdb)
+	// userdb2 := models.User{}
+	// Db.Model(&userdb2).Where("id = ?", roll2).First(&userdb2)
+	// userdb2.Matches = userdb2.Matches + "," + roll1
+	// Db.Save(&userdb2)
 
-	Db.First(&userdb1, "id = ", roll2)
-	userdb1.Matches = userdb1.Matches + "," + roll1
-	Db.Save(&userdb1)
+	// temp1, _ := strconv.Atoi(userID.(string))
+	// temp2, _ := strconv.Atoi(heartClaim.Roll)
 
-	temp1, _ := strconv.Atoi(userID.(string))
-	temp2, _ := strconv.Atoi(heartClaim.Roll)
+	// if temp1 < temp2 {
+	// 	returnHeartClaim := models.MatchTable{
+	// 		Roll1: userID.(string),
+	// 		Roll2: heartClaim.Roll,
+	// 	}
+	// 	if err := Db.Create(&returnHeartClaim).Error; err != nil {
+	// 		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+	// 		return
+	// 	}
+	// } else if temp2 < temp1 {
+	// 	returnHeartClaim := models.MatchTable{
+	// 		Roll2: userID.(string),
+	// 		Roll1: heartClaim.Roll,
+	// 	}
+	// 	if err := Db.Create(&returnHeartClaim).Error; err != nil {
+	// 		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+	// 		return
+	// 	}
+	// }
 
-	if temp1 < temp2 {
-		returnHeartClaim := models.MatchTable{
-			Roll1: userID.(string),
-			Roll2: heartClaim.Roll,
-		}
-		if err := Db.Create(&returnHeartClaim).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err})
-			return
-		}
-	} else if temp2 < temp1 {
-		returnHeartClaim := models.MatchTable{
-			Roll2: userID.(string),
-			Roll1: heartClaim.Roll,
-		}
-		if err := Db.Create(&returnHeartClaim).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err})
-			return
-		}
+	returnHeartClaim := models.MatchTable{
+		Roll1: userID.(string),
+		Roll2: heartClaim.Roll,
+	}
+	if err := Db.Create(&returnHeartClaim).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+		return
 	}
 
 	c.JSON(http.StatusAccepted, gin.H{"message": "Heart Claim Success"})
@@ -459,7 +467,7 @@ func VerifyReturnHeart(c *gin.Context) {
 func MatchesHandler(c *gin.Context) {
 	if models.PublishMatches {
 
-		results := []string{}
+		resultsmap := make(map[string]bool)
 		userID, _ := c.Get("user_id")
 		var user models.User
 
@@ -470,15 +478,14 @@ func MatchesHandler(c *gin.Context) {
 			return
 		}
 
-		var matches []models.MatchTable
-		var matchDb models.MatchTable
-		Db.Model(&matchDb).Where("roll1 = ?", userID).Find(&matches)
+		matches := strings.Split(user.Matches, ",")
+
 		for _, match := range matches {
-			var user2 models.User
-			Db.Model(&user2).Where("id=?", match.Roll2).First(&user2)
-			if user2.Publish {
-				results = append(results, match.Roll2)
-			}
+			resultsmap[match] = true
+		}
+		results := []string{}
+		for key := range resultsmap {
+			results = append(results, key)
 		}
 		c.JSON(http.StatusOK, gin.H{"matches": results})
 		return

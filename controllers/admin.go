@@ -3,6 +3,7 @@ package controllers
 import (
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -136,6 +137,48 @@ func DeleteAllUsers(c *gin.Context) {
 
 func PublishResults(c *gin.Context) {
 	if !models.PublishMatches {
+		var matchdb models.MatchTable
+		var matches []models.MatchTable
+		records := Db.Model(&matchdb).Where("").Find(&matches)
+		if records.Error != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Some error occured while calculating matches"})
+			return
+		}
+		matchesMap := make(map[string][]string)
+		for _, match := range matches {
+			roll1 := match.Roll1
+			roll2 := match.Roll2
+			var userdb models.User
+			var userdb1 models.User
+			record := Db.Model(&userdb).Where("id = ?", roll1).First(&userdb)
+			if record.Error != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "Error occured while connecting to db"})
+				return
+			}
+			record = Db.Model(&userdb1).Where("id = ?", roll2).First(&userdb1)
+			if record.Error != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "Error occured while connecting to db"})
+				return
+			}
+			if userdb.Publish && userdb1.Publish {
+				matchesMap[roll1] = append(matchesMap[roll1], roll2)
+				matchesMap[roll2] = append(matchesMap[roll2], roll1)
+			}
+		}
+		for key := range matchesMap {
+			var userdb models.User
+			record := Db.Model(&userdb).Where("id = ?", key).First(&userdb)
+			if record.Error != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "Error updating matches of " + key})
+				return
+			}
+			userdb.Matches = strings.Join(matchesMap[key], ",")
+			record = Db.Save(&userdb)
+			if record.Error != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "Error updating matches of " + key})
+				return
+			}
+		}
 		models.PublishMatches = true
 		c.JSON(http.StatusOK, gin.H{"msg": "Published Matches"})
 		return

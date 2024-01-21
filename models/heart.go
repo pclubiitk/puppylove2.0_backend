@@ -102,7 +102,7 @@ type FetchReturnHeart struct {
 type (
 	MatchTable struct {
 		gorm.Model
-		Roll1 string `json:"roll1" bson:"roll1" gorm:"unique_index:idx_roll1_roll2"`
-		Roll2 string `json:"roll2" bson:"roll2" gorm:"unique_index:idx_roll1_roll2"`
+		Roll1 string `json:"roll1" bson:"roll1"`
+		Roll2 string `json:"roll2" bson:"roll2"`
 	}
 )
