@@ -69,3 +69,10 @@ type MailData struct {
 	AuthC string `json:"authCode" binding:"required"`
 	Dirty bool   `json:"dirty" binding:"required"`
 }
+
+var StatsFlag = true
+var FemaleRegisters = 0
+var MaleRegisters = 0
+var NumberOfMatches = 0
+var RegisterMap = make(map[string]int)
+var MatchMap = make(map[string]int)
