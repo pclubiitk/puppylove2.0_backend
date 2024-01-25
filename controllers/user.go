@@ -467,7 +467,7 @@ func VerifyReturnHeart(c *gin.Context) {
 func MatchesHandler(c *gin.Context) {
 	if models.PublishMatches {
 
-		resultsmap := make(map[string]bool)
+		// resultsmap := make(map[string]bool)
 		userID, _ := c.Get("user_id")
 		var user models.User
 
@@ -480,14 +480,14 @@ func MatchesHandler(c *gin.Context) {
 
 		matches := strings.Split(user.Matches, ",")
 
-		for _, match := range matches {
-			resultsmap[match] = true
-		}
-		results := []string{}
-		for key := range resultsmap {
-			results = append(results, key)
-		}
-		c.JSON(http.StatusOK, gin.H{"matches": results})
+		// for _, match := range matches {
+		// 	resultsmap[match] = true
+		// }
+		// results := []string{}
+		// for key := range resultsmap {
+		// 	results = append(results, key)
+		// }
+		c.JSON(http.StatusOK, gin.H{"matches": matches})
 		return
 
 	}
