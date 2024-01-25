@@ -172,7 +172,15 @@ func PublishResults(c *gin.Context) {
 				c.JSON(http.StatusInternalServerError, gin.H{"error": "Error updating matches of " + key})
 				return
 			}
-			userdb.Matches = strings.Join(matchesMap[key], ",")
+			tempMap := make(map[string]bool)
+			for _, match := range matchesMap[key] {
+				tempMap[match] = true
+			}
+			results := []string{}
+			for key := range tempMap {
+				results = append(results, key)
+			}
+			userdb.Matches = strings.Join(results, ",")
 			record = Db.Save(&userdb)
 			if record.Error != nil {
 				c.JSON(http.StatusInternalServerError, gin.H{"error": "Error updating matches of " + key})
