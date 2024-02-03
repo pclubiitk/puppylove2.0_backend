@@ -43,9 +43,14 @@ func UserLogin(c *gin.Context) {
 		Expires:  expirationTime,
 		Path:     "/",
 		Domain:   os.Getenv("DOMAIN"),
-		HttpOnly: true,
-		Secure:   false, // Set this to true if you're using HTTPS, false for HTTP
-		SameSite: http.SameSiteStrictMode,
+		// For Http
+		// HttpOnly: true,
+		// Secure:   false, // Set this to true if you're using HTTPS, false for HTTP
+		// SameSite: http.SameSiteStrictMode,
+		// For Https
+		HttpOnly: false,
+		Secure:   true, // Set this to true if you're using HTTPS, false for HTTP
+		SameSite: http.SameSiteNoneMode,
 	}
 
 	http.SetCookie(c.Writer, cookie)
@@ -59,8 +64,12 @@ func UserLogout(c *gin.Context) {
 		Expires:  time.Now().Add(-time.Hour), // Expire the cookie immediately
 		Path:     "/",
 		Domain:   os.Getenv("DOMAIN"),
-		HttpOnly: true,
-		Secure:   false,
+		// HttpOnly: true,
+		// Secure:   false,
+		// SameSite: http.SameSiteNoneMode,
+		// For Htpps
+		HttpOnly: false,
+		Secure:   true, // Set this to true if you're using HTTPS, false for HTTP
 		SameSite: http.SameSiteNoneMode,
 	}
 
