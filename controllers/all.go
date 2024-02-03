@@ -113,7 +113,7 @@ func UserMail(c *gin.Context) {
 	AuthC := utils.RandStringRunes(15)
 	Db.Model(&user).Where("id = ?", id).Update("AuthC", AuthC)
 	if mail.SendMail(u.Name, u.Email, AuthC) != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Something went wrong, Please try again."})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Something went wrong, Please try again."})
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"message": "Auth. code sent successfully !!"})

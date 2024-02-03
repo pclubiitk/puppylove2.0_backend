@@ -7,20 +7,19 @@ import (
 	"os"
 )
 
+func sendEmail(from, password, smtpHost, smtpPort, to string, bodyContent []byte) error {
+	auth := smtp.PlainAuth("", from, password, smtpHost)
+	err := smtp.SendMail(smtpHost+":"+smtpPort, auth, from, []string{to}, bodyContent)
+	return err
+}
+
 func SendMail(name string, to string, authCode string) error {
 
+	// smtp server configuration.
 	from := os.Getenv("EMAIL_ID")
 	password := os.Getenv("EMAIL_PASS")
-
-	// 	// smtp server configuration.
-	smtpHost := "mmtp.iitk.ac.in"
-	smtpPort := "25"
-
-	var toSend []string
-	toSend = append(toSend, to)
-
-	// Authentication.
-	auth := smtp.PlainAuth("", from, password, smtpHost)
+	smtpHost := os.Getenv("SMTP_HOST")
+	smtpPort := os.Getenv("SMTP_PORT")
 
 	var body bytes.Buffer
 
@@ -31,10 +30,23 @@ func SendMail(name string, to string, authCode string) error {
 	body.Write([]byte(mailTemplate))
 
 	// Sending email
-	err := smtp.SendMail(smtpHost+":"+smtpPort, auth, from, toSend, body.Bytes())
+	err := sendEmail(from, password, smtpHost, smtpPort, to, body.Bytes())
+
 	if err != nil {
-		fmt.Println(err)
-		return err
+		fmt.Printf("Error sending email to %s using the first email configuration: %v\n", to, err)
+
+		// Second email configuration.
+		from = os.Getenv("EMAIL_ID_2")
+		password = os.Getenv("EMAIL_PASS_2")
+		smtpHost = os.Getenv("SMTP_HOST_2")
+		smtpPort = os.Getenv("SMTP_PORT_2")
+
+		// Retry with the second email configuration.
+		err = sendEmail(from, password, smtpHost, smtpPort, to, body.Bytes())
+		if err != nil {
+			fmt.Printf("Error sending email to %s using the second email configuration: %v\n", to, err)
+			return err
+		}
 	}
 	return nil
 }

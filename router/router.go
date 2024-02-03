@@ -14,7 +14,7 @@ func PuppyRoute(r *gin.Engine, db db.PuppyDb) {
 		c.JSON(http.StatusAccepted, "Hello from the other side!")
 	})
 
-	// assigning here cuz I'm only inporting controllers here, & considering their size better import them here.
+	// assigning here cuz I'm only importing controllers here, & considering their size better import them here.
 	controllers.Db = db
 
 	// User administration
