@@ -1,5 +1,10 @@
 FROM ubuntu:20.04 AS base-stage
 
+# Install CA certificates
+RUN apt-get update && \
+    apt-get install -y ca-certificates && \
+    rm -rf /var/lib/apt/lists/*
+
 FROM golang:1.21 AS build-stage
 
 WORKDIR /app
