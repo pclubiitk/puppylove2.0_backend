@@ -144,6 +144,9 @@ func GetStats(c *gin.Context) {
 					models.FemaleRegisters++
 				}
 				models.RegisterMap["y"+user.Id[0:2]]++
+				if user.Matches == "" {
+					continue
+				}
 				var matchCount = len(strings.Split(user.Matches, ","))
 				if matchCount != 0 {
 					models.NumberOfMatches += matchCount
