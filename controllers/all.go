@@ -136,22 +136,29 @@ func GetStats(c *gin.Context) {
 		}
 
 		for _, user := range users {
-			if user.Dirty {
+			// log.Print(user.Id)
+			if len(user.Id) >= 2 && user.Dirty {
 				if user.Gender == "M" {
 					models.MaleRegisters++
 				} else {
 					models.FemaleRegisters++
 				}
 				models.RegisterMap["y"+user.Id[0:2]]++
+				if user.Matches == "" {
+					continue
+				}
 				var matchCount = len(strings.Split(user.Matches, ","))
 				if matchCount != 0 {
 					models.NumberOfMatches += matchCount
 					var myMatches = strings.Split(user.Matches, ",")
 					for _, t := range myMatches {
-						models.MatchMap["y"+t[0:2]]++
+						if len(t) >= 2 {
+							models.MatchMap["y"+t[0:2]]++
+						}
 					}
 				}
 			}
+			// log.Print("Done")
 		}
 	}
 	c.JSON(http.StatusOK, gin.H{
