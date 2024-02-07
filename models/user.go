@@ -58,6 +58,10 @@ type UserLogin struct {
 }
 
 // w'll change it later (maybee..)
+type Captcha struct {
+	recaptchatoken string `json:"recaptchatoken" binding:"required"`
+}
+
 type AdminLogin struct {
 	Id   string `json:"id" binding:"required"`
 	Pass string `json:"pass" binding:"required"`
