@@ -1,16 +1,16 @@
 package controllers
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
-	"io/ioutil"
-	"encoding/json"
+
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"
 )
-
 
 func CheckGoogleCaptcha(response string) bool {
 	var googleCaptcha string = os.Getenv("CAPTCHA_SECRET")
@@ -36,7 +36,8 @@ func CheckGoogleCaptcha(response string) bool {
 func Captchacheck() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		captcha := c.GetHeader("g-recaptcha-response")
-		fmt.Println(captcha)
+		// function working properly, no need for this now.
+		// fmt.Println(captcha)
 		human := CheckGoogleCaptcha(captcha)
 		if !human {
 			c.JSON(http.StatusForbidden, gin.H{"error": "Invalid Captcha."})
