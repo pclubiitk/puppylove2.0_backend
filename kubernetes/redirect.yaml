@@ -1,0 +1,7 @@
+apiVersion: networking.gke.io/v1beta1
+kind: FrontendConfig
+metadata:
+  name: http-to-https-redirect
+spec:
+  redirectToHttps:
+    enabled: true
