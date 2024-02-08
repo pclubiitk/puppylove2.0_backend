@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-core
+spec:
+  ports:
+    - port: 3000
+      protocol: TCP
+      targetPort: 3000
+      nodePort: 30300
+  selector:
+    app: frontend-core
+  sessionAffinity: None
+  type: NodePort
