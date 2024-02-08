@@ -4,13 +4,11 @@ import (
 	"errors"
 	"net/http"
 	"strings"
-	"os"
+
 	"github.com/gin-gonic/gin"
 	"github.com/pclubiitk/puppylove2.0_backend/mail"
 	"github.com/pclubiitk/puppylove2.0_backend/models"
 	"github.com/pclubiitk/puppylove2.0_backend/utils"
-	"github.com/dpapathanasiou/go-recaptcha"
-	"fmt"
 	"gorm.io/gorm"
 )
 
@@ -94,39 +92,8 @@ func SentHeartDecoded(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"male": matchCount.male, "female": matchCount.female})
 }
 
-func VerifyCaptcha(clientIP, token string) error {
-	csec := os.Getenv("CAPTCHA_SECRET")
-	recaptcha.Init(csec)
-
-	res,err := recaptcha.Confirm(clientIP, token)
-	// fmt.Println(res)
-	// fmt.Println(token)
-	if res == false {
-		return err
-	}
-
-	return nil
-}
-
 func UserMail(c *gin.Context) {
 	id := c.Param("id")
-
-	recap := new(models.Captcha)
-	if err := c.BindJSON(recap); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Captcha data format."})
-		return
-	}
-	clientIP := c.ClientIP()
-	// fmt.Println(clientIP)
-	// fmt.Println(recap.recaptchatoken)
-
-	err := VerifyCaptcha(clientIP, recap.recaptchatoken)
-
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Captcha token."})
-		return
-	}
-
 	u := models.MailData{}
 	user := models.User{}
 	record := Db.Model(&user).Where("id = ?", id).First(&u)

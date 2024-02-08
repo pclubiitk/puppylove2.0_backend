@@ -28,7 +28,11 @@ func main() {
 	// Local Testing Frontend Running on localhost:3000
 	// r.Use(cors.New(cors.Config{AllowCredentials: true, AllowOrigins: []string{"http://localhost:3000"}, AllowHeaders: []string{"content-type"}}))
 	// Allow all origins
-	r.Use(cors.New(cors.Config{AllowCredentials: true, AllowOriginFunc: func(origin string) bool {return true}, AllowHeaders: []string{"content-type"}}))
+	r.Use(cors.New(cors.Config{
+		AllowCredentials: true,
+		AllowOriginFunc:  func(origin string) bool { return true },
+		AllowHeaders:     []string{"content-type", "g-recaptcha-response"},
+	}))
 	r.Use(sessions.Sessions("adminsession", store))
 	router.PuppyRoute(r, *Db)
 

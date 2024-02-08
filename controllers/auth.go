@@ -5,10 +5,47 @@ import (
 	"log"
 	"net/http"
 	"os"
-
+	"io/ioutil"
+	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"
 )
+
+
+func CheckGoogleCaptcha(response string) bool {
+	var googleCaptcha string = os.Getenv("CAPTCHA_SECRET")
+	req, _ := http.NewRequest("POST", "https://www.google.com/recaptcha/api/siteverify", nil)
+	q := req.URL.Query()
+	q.Add("secret", googleCaptcha)
+	q.Add("response", response)
+	req.URL.RawQuery = q.Encode()
+	client := &http.Client{}
+	var googleResponse map[string]interface{}
+	resp, err := client.Do(req)
+	// fmt.Println(resp)
+	if err != nil {
+		return false
+	}
+	defer resp.Body.Close()
+	body, _ := ioutil.ReadAll(resp.Body)
+	json.Unmarshal(body, &googleResponse)
+	fmt.Println(googleResponse["success"])
+	return googleResponse["success"].(bool)
+}
+
+func Captchacheck() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		captcha := c.GetHeader("g-recaptcha-response")
+		fmt.Println(captcha)
+		human := CheckGoogleCaptcha(captcha)
+		if !human {
+			c.JSON(http.StatusForbidden, gin.H{"error": "Invalid Captcha."})
+			c.Abort()
+			return
+		}
+		c.Next()
+	}
+}
 
 func AuthenticateAdmin() gin.HandlerFunc {
 	return func(c *gin.Context) {

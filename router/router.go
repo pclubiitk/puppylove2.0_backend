@@ -17,10 +17,17 @@ func PuppyRoute(r *gin.Engine, db db.PuppyDb) {
 	// assigning here cuz I'm only importing controllers here, & considering their size better import them here.
 	controllers.Db = db
 
+	// Captcha
+	captcha := r.Group("/captcha/user")
+	{
+		captcha.Use(controllers.Captchacheck())
+		captcha.POST("/mail/:id", controllers.UserMail)
+		captcha.POST("/login", controllers.UserLogin)
+	}
 	// User administration
 	users := r.Group("/users")
 	{
-		users.POST("/mail/:id", controllers.UserMail)
+		// users.POST("/mail/:id", controllers.UserMail)
 		users.POST("/login/first", controllers.UserFirstLogin)
 		users.Use(controllers.AuthenticateUser())
 		users.GET("/activeusers", controllers.GetActiveUsers)
@@ -54,7 +61,7 @@ func PuppyRoute(r *gin.Engine, db db.PuppyDb) {
 	session := r.Group("/session")
 	{
 		session.POST("/admin/login", controllers.AdminLogin)
-		session.POST("/login", controllers.UserLogin)
+		// session.POST("/login", controllers.UserLogin)
 		session.GET("/logout", controllers.UserLogout)
 	}
 
