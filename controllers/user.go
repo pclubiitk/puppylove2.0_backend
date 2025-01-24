@@ -12,6 +12,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/pclubiitk/puppylove2.0_backend/models"
+	"golang.org/x/exp/rand"
 	"gorm.io/gorm"
 )
 
@@ -76,6 +77,7 @@ func UserFirstLogin(c *gin.Context) {
 		Data:   info.Data,
 		Claims: "",
 		Dirty:  true,
+		Code:   "",
 	}).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Something went wrong, Please try again."})
 		return
@@ -381,7 +383,6 @@ func GetActiveUsers(c *gin.Context) {
 		if user.Dirty {
 			results = append(results, user.Id)
 		}
-
 	}
 	c.JSON(http.StatusOK, gin.H{"users": results})
 }
@@ -492,4 +493,72 @@ func MatchesHandler(c *gin.Context) {
 
 	}
 	c.JSON(http.StatusOK, gin.H{"msg": "Matches not yet published"})
+}
+
+func UpdateAbout(c *gin.Context) {
+	about := new(models.UpdateAbout)
+	if err := c.BindJSON(about); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Input data format."})
+		return
+	}
+	if len(about.About) > 60 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Too long about."})
+		return
+	}
+	userID, _ := c.Get("user_id")
+	user := models.User{}
+
+	record := Db.Model((&user)).Where("id = ?", userID).Update("about", about.About)
+	if record.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Some Error occured Please try later"})
+		return
+	}
+	c.JSON(http.StatusAccepted, gin.H{"message": "Update Successful!"})
+
+}
+
+func UpdateIntrest(c *gin.Context) {
+	intrestReq := new(models.UpdateIntrest)
+	if err := c.BindJSON(intrestReq); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Input data format."})
+		return
+	}
+	userID, _ := c.Get("user_id")
+	user := models.User{}
+
+	// to save our server form very very long tags.
+	if len(intrestReq.Intrests) > 40 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Too long tags."})
+		return
+	}
+
+	record := Db.Model((&user)).Where("id = ?", userID).Update("intrests", intrestReq.Intrests)
+	if record.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Some Error occured Please try later"})
+		return
+	}
+	c.JSON(http.StatusAccepted, gin.H{"message": "Update Successful!"})
+}
+
+func SuggestRandom(c *gin.Context) {
+	var users []models.User
+	var userDB models.User
+
+	Db.Model(userDB).Where("dirty = ?", true).Find(&users)
+
+	// Shuffle the users randomly
+	rand.Seed(uint64(time.Now().UnixNano()))
+	rand.Shuffle(len(users), func(i, j int) {
+		users[i], users[j] = users[j], users[i]
+	})
+
+	// Select the first 10 users
+	var results []string
+	for i, user := range users {
+		if i >= 10 {
+			break
+		}
+		results = append(results, user.Id)
+	}
+	c.JSON(http.StatusOK, gin.H{"users": results})
 }

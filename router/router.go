@@ -28,11 +28,21 @@ func PuppyRoute(r *gin.Engine, db db.PuppyDb) {
 	users := r.Group("/users")
 	{
 		// users.POST("/mail/:id", controllers.UserMail)
+		users.POST("/retrive", controllers.RetrivePass)
 		users.POST("/login/first", controllers.UserFirstLogin)
 		users.Use(controllers.AuthenticateUser())
+		users.POST("/addRecovery", controllers.AddRecovery)
+		users.GET("/data", controllers.GetUserData)
 		users.GET("/activeusers", controllers.GetActiveUsers)
 		users.GET("/fetchPublicKeys", controllers.FetchPublicKeys)
 		users.GET("/fetchReturnHearts", controllers.FetchReturnHearts)
+
+		// profile info
+		users.POST("/about", controllers.UpdateAbout)
+		users.POST("/intrests", controllers.UpdateIntrest)
+
+		// random search option
+		users.GET("/random", controllers.SuggestRandom)
 
 		//Api for verifying hearts that are fetched from Return Table
 		users.POST("/verifyreturnhearts", controllers.VerifyReturnHeart)
