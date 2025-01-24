@@ -5,7 +5,6 @@ import (
 	"os"
 	"strings"
 	"time"
-
 	"github.com/gin-gonic/gin"
 	"github.com/pclubiitk/puppylove2.0_backend/db"
 	"github.com/pclubiitk/puppylove2.0_backend/models"
@@ -70,19 +69,22 @@ func AddNewUser(c *gin.Context) {
 	for _, user := range info.TypeUserNew {
 
 		newUser := models.User{
-			Id:      user.Id,
-			Name:    user.Name,
-			Email:   user.Email,
-			Gender:  user.Gender,
-			Pass:    "",
-			PubK:    "",
-			PrivK:   "",
-			AuthC:   utils.RandStringRunes(15),
-			Data:    "",
-			Submit:  false,
-			Matches: "",
-			Dirty:   false,
-			Publish: false,
+			Id:       user.Id,
+			Name:     user.Name,
+			Email:    user.Email,
+			Gender:   user.Gender,
+			Pass:     "",
+			PubK:     "",
+			PrivK:    "",
+			AuthC:    utils.RandStringRunes(15),
+			Data:     "",
+			Submit:   false,
+			Matches:  "",
+			Dirty:    false,
+			Publish:  false,
+			Code:     "",
+			About:    "",
+			Intrests: "{}",
 		}
 
 		// Insert the user into the database
