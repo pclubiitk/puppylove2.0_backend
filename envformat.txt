@@ -23,3 +23,4 @@ EMAIL_ID_2 = "hello2@iitk.ac.in"
 EMAIL_PASS_2 = "haveibeenpwned?"
 SMTP_HOST_2 = "smtp.gmail.com"
 SMTP_PORT_2 = 587
+RATE_LIMIT = 50 #threshold for rate limiting
