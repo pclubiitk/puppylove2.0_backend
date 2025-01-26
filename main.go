@@ -12,6 +12,7 @@ import (
 	"github.com/pclubiitk/puppylove2.0_backend/db"
 	"github.com/pclubiitk/puppylove2.0_backend/router"
 	"github.com/pclubiitk/puppylove2.0_backend/utils"
+	"github.com/pclubiitk/puppylove2.0_backend/redisclient"
 )
 
 func main() {
@@ -21,7 +22,7 @@ func main() {
 	}
 	var CfgAdminPass = os.Getenv("CFG_ADMIN_PASS")
 	Db := db.InitDB()
-
+	redisclient.InitRedis()
 	utils.Randinit()
 	store := cookie.NewStore([]byte(CfgAdminPass))
 	r := gin.Default()

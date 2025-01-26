@@ -11,17 +11,29 @@ import (
 	"github.com/pclubiitk/puppylove2.0_backend/models"
 	"github.com/pclubiitk/puppylove2.0_backend/utils"
 	"gorm.io/gorm"
+	"github.com/pclubiitk/puppylove2.0_backend/redisclient"
 )
 
 func FetchPublicKeys(c *gin.Context) {
-	var userModel models.User
-	var publicKeys []models.UserPublicKey
-	fetchPublicKey := Db.Model(&userModel).Select("id, pub_k").Find(&publicKeys)
-	if fetchPublicKey.Error != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Some Error Occured"})
+	publicKeysMap, err := redisclient.RedisClient.HGetAll(redisclient.Ctx, "public_keys").Result()
+	if err == nil && len(publicKeysMap) > 0 {
+		c.JSON(http.StatusOK, publicKeysMap)
 		return
 	}
-	c.JSON(http.StatusOK, publicKeys)
+	var publicKeys []models.UserPublicKey
+	var userModel models.User
+	fetchPublicKey := Db.Model(&userModel).Select("id, pub_k").Find(&publicKeys)
+	if fetchPublicKey.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Some Error Occurred"})
+		return
+	}
+	responseMap := make(map[string]string)
+	for _, key := range publicKeys {
+		redisclient.RedisClient.HSet(redisclient.Ctx, "public_keys", key.Id, key.PubK)
+		responseMap[key.Id] = key.PubK
+	}
+	// redisclient.ViewRedis()
+	c.JSON(http.StatusOK, responseMap)
 }
 
 func FetchReturnHearts(c *gin.Context) {
