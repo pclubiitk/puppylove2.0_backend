@@ -14,6 +14,7 @@ import (
 	"github.com/pclubiitk/puppylove2.0_backend/models"
 	"golang.org/x/exp/rand"
 	"gorm.io/gorm"
+	"github.com/pclubiitk/puppylove2.0_backend/redisclient"
 )
 
 func UserFirstLogin(c *gin.Context) {
@@ -82,7 +83,7 @@ func UserFirstLogin(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Something went wrong, Please try again."})
 		return
 	}
-
+	redisclient.RedisClient.HSet(redisclient.Ctx, "public_keys", info.Id, info.PubKey)
 	c.JSON(http.StatusCreated, gin.H{"message": "User Created Successfully."})
 }
 

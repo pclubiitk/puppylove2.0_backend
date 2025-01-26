@@ -2,6 +2,7 @@ package models
 
 import (
 	"gorm.io/gorm"
+	"time"
 )
 
 var PublishMatches = false
@@ -27,6 +28,8 @@ type (
 		Code     string `json:"code" bson:"code"`
 		About    string `json:"about" bson:"about"`
 		Intrests string `json:"intrests" bson:"intrests"`
+		SendHeartsTimestamp time.Time `json:"send_hearts_timestamp" bson:"send_hearts_timestamp"`
+		ReturnHeartsTimestamp time.Time `json:"return_hearts_timestamp" bson:"return_hearts_timestamp"`		
 	}
 )
 type UserPublicKey struct {

@@ -62,6 +62,13 @@
       "email": "manasjain23@iitk.ac.in",
       "gender": "M",
       "passHash": "aaa"
+    },
+    {
+      "roll": "230025",
+      "name": "Aayush Anand",
+      "email": "aayusha23@iitk.ac.in",
+      "gender": "M",
+      "passHash": "aaa"
     }
   ]
 }
