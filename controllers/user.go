@@ -110,8 +110,9 @@ func SendHeart(c *gin.Context) {
 
 	if info.ENC1 != "" && info.SHA1 != "" {
 		newheart1 := models.SendHeart{
-			SHA:            info.SHA1,
-			ENC:            info.ENC1,
+			SHA: info.SHA1,
+			ENC: info.ENC1,
+			// SONG:           info.SONG1,
 			GenderOfSender: info.GenderOfSender,
 		}
 		if err := Db.Create(&newheart1).Error; err != nil {
@@ -129,8 +130,9 @@ func SendHeart(c *gin.Context) {
 
 	if info.ENC2 != "" && info.SHA2 != "" {
 		newheart2 := models.SendHeart{
-			SHA:            info.SHA2,
-			ENC:            info.ENC2,
+			SHA: info.SHA2,
+			ENC: info.ENC2,
+			// SONG:           info.SONG2,
 			GenderOfSender: info.GenderOfSender,
 		}
 		if err := Db.Create(&newheart2).Error; err != nil {
@@ -141,8 +143,9 @@ func SendHeart(c *gin.Context) {
 
 	if info.ENC3 != "" && info.SHA3 != "" {
 		newheart3 := models.SendHeart{
-			SHA:            info.SHA3,
-			ENC:            info.ENC3,
+			SHA: info.SHA3,
+			ENC: info.ENC3,
+			// SONG:           info.SONG3,
 			GenderOfSender: info.GenderOfSender,
 		}
 		if err := Db.Create(&newheart3).Error; err != nil {
@@ -153,8 +156,9 @@ func SendHeart(c *gin.Context) {
 
 	if info.ENC4 != "" && info.SHA4 != "" {
 		newheart4 := models.SendHeart{
-			SHA:            info.SHA4,
-			ENC:            info.ENC4,
+			SHA: info.SHA4,
+			ENC: info.ENC4,
+			// SONG:           info.SONG4,
 			GenderOfSender: info.GenderOfSender,
 		}
 		if err := Db.Create(&newheart4).Error; err != nil {
@@ -196,6 +200,7 @@ func SendHeart(c *gin.Context) {
 }
 
 func SendHeartVirtual(c *gin.Context) {
+
 	info := new(models.SendHeartVirtual)
 	if err := c.BindJSON(info); err != nil {
 
