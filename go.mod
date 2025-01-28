@@ -1,9 +1,7 @@
 module github.com/pclubiitk/puppylove2.0_backend
 
-go 1.22.0
-
+go 1.23.0
 toolchain go1.23.4
-
 require (
 	github.com/gin-contrib/cors v1.4.0
 	github.com/gin-contrib/sessions v0.0.5

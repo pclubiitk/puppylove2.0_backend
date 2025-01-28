@@ -1,14 +1,14 @@
 package controllers
 
 import (
-	"net/http"
-	"os"
-	"strings"
-	"time"
 	"github.com/gin-gonic/gin"
 	"github.com/pclubiitk/puppylove2.0_backend/db"
 	"github.com/pclubiitk/puppylove2.0_backend/models"
 	"github.com/pclubiitk/puppylove2.0_backend/utils"
+	"net/http"
+	"os"
+	"strings"
+	"time"
 )
 
 var Db db.PuppyDb
