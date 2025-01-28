@@ -1,6 +1,13 @@
 {
   "newuser": [
     {
+      "roll":"230645",
+      "name":"Medha Agarwal",
+      "email":"medhaagar23@iitk.ac.in",
+      "gender":"F",
+      "passHash":"aaa"
+    },
+    {
       "roll": "210755",
       "name": "Pratham  Sahu",
       "email": "spratham21@iitk.ac.in",
