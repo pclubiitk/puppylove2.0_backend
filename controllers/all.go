@@ -2,16 +2,16 @@ package controllers
 
 import (
 	"errors"
-	"net/http"
-	"strings"
-	"time"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/pclubiitk/puppylove2.0_backend/mail"
 	"github.com/pclubiitk/puppylove2.0_backend/models"
+	"github.com/pclubiitk/puppylove2.0_backend/redisclient"
 	"github.com/pclubiitk/puppylove2.0_backend/utils"
 	"gorm.io/gorm"
-	"github.com/pclubiitk/puppylove2.0_backend/redisclient"
+	"net/http"
+	"strings"
+	"time"
 )
 
 func FetchPublicKeys(c *gin.Context) {
@@ -126,7 +126,7 @@ func FetchHearts(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch hearts"})
 		return
 	}
-	newTimestamp := time.Now().UTC().Add(-1*time.Minute).Format(time.RFC3339)
+	newTimestamp := time.Now().UTC().Add(-1 * time.Minute).Format(time.RFC3339)
 	if err := Db.Model(&models.User{}).
 		Where("id = ?", userID).
 		Update("send_hearts_timestamp", newTimestamp).Error; err != nil {
