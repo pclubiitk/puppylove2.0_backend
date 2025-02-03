@@ -27,6 +27,9 @@ func PuppyRoute(r *gin.Engine, db db.PuppyDb) {
 	// User administration
 	users := r.Group("/users")
 	{
+		// all user tags and about, it dont need the authentication
+		users.GET("/alluserInfo", controllers.GetAllUsersInfo)
+
 		// users.POST("/mail/:id", controllers.UserMail)
 		users.POST("/retrive", controllers.RetrivePass)
 		users.POST("/login/first", controllers.UserFirstLogin)
@@ -39,7 +42,7 @@ func PuppyRoute(r *gin.Engine, db db.PuppyDb) {
 
 		// profile info
 		users.POST("/about", controllers.UpdateAbout)
-		users.POST("/intrests", controllers.UpdateIntrest)
+		users.POST("/interests", controllers.UpdateInterest)
 
 		// random search option
 		users.GET("/random", controllers.SuggestRandom)

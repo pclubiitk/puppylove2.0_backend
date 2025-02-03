@@ -21,5 +21,12 @@ headers_with_cookie = {
     'Cookie': cookie
 }
 
-res = s.get(f'{url}/admin/publish',headers=headers_with_cookie)
-print(res.json)
+method = input("to end the permit enter 1\nto publish the results enter 2\n")
+
+if method == "1":
+    res = s.get(f'{url}/admin/TogglePermit',headers=headers_with_cookie)
+    print(res.json)
+elif method == "2":
+    res = s.get(f'{url}/admin/publish',headers=headers_with_cookie)
+    print(res.json)
+
