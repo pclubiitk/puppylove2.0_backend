@@ -44,9 +44,6 @@ func PuppyRoute(r *gin.Engine, db db.PuppyDb) {
 		users.POST("/about", controllers.UpdateAbout)
 		users.POST("/interests", controllers.UpdateInterest)
 
-		// random search option
-		users.GET("/random", controllers.SuggestRandom)
-
 		//Api for verifying hearts that are fetched from Return Table
 		users.POST("/verifyreturnhearts", controllers.VerifyReturnHeart)
 		users.GET("/fetchall", controllers.FetchHearts)

@@ -7,7 +7,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/pclubiitk/puppylove2.0_backend/models"
 	"github.com/pclubiitk/puppylove2.0_backend/redisclient"
-	"golang.org/x/exp/rand"
 )
 
 func UpdateAbout(c *gin.Context) {
@@ -16,7 +15,7 @@ func UpdateAbout(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Input data format."})
 		return
 	}
-	if len(about.About) > 60 {
+	if len(about.About) > 70 {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Too long about."})
 		return
 	}
@@ -42,7 +41,7 @@ func UpdateInterest(c *gin.Context) {
 	user := models.User{}
 
 	// to save our server form very very long tags.
-	if len(interestReq.Interests) > 40 {
+	if len(interestReq.Interests) > 50 {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Too long tags."})
 		return
 	}
@@ -82,33 +81,11 @@ func GetAllUsersInfo(c *gin.Context) {
 		redisclient.RedisClient.HSet(redisclient.Ctx, "about_map", user.Id, string(user.About))
 		redisclient.RedisClient.HSet(redisclient.Ctx, "interests_map", user.Id, string(user.Interests))
 
-		// setting expiry time for the keys to 3 hours
-		redisclient.RedisClient.Expire(redisclient.Ctx, "about_map", 3*time.Hour)
-		redisclient.RedisClient.Expire(redisclient.Ctx, "interests_map", 3*time.Hour)
+		// setting expiry time for the keys to 1 hours
+		expiryTime := 1 * time.Hour
+		redisclient.RedisClient.Expire(redisclient.Ctx, "about_map", expiryTime)
+		redisclient.RedisClient.Expire(redisclient.Ctx, "interests_map", expiryTime)
 		aboutMap[user.Id] = string(user.About)
 	}
 	c.JSON(http.StatusOK, gin.H{"about": aboutMap, "interests": interestsMap})
-}
-
-func SuggestRandom(c *gin.Context) {
-	var users []models.User
-	var userDB models.User
-
-	Db.Model(userDB).Where("dirty = ?", true).Find(&users)
-
-	// Shuffle the users randomly
-	rand.Seed(uint64(time.Now().UnixNano()))
-	rand.Shuffle(len(users), func(i, j int) {
-		users[i], users[j] = users[j], users[i]
-	})
-
-	// Select the first 10 users
-	var results []string
-	for i, user := range users {
-		if i >= 10 {
-			break
-		}
-		results = append(results, user.Id)
-	}
-	c.JSON(http.StatusOK, gin.H{"users": results})
 }
