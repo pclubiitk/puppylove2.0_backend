@@ -117,7 +117,7 @@ func GetUserData(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"message": "Data retrieved successfully !!", "id": userID, "data": user.Data, "gender": user.Gender, "submit": user.Submit, "claims": user.Claims, "permit": permit, "publish": user.Publish, "about": user.About, "intrest": user.Intrests})
+	c.JSON(http.StatusOK, gin.H{"message": "Data retrieved successfully !!", "id": userID, "data": user.Data, "gender": user.Gender, "submit": user.Submit, "claims": user.Claims, "permit": permit, "publish": user.Publish, "about": user.About, "interest": user.Interests})
 }
 
 func UserLogout(c *gin.Context) {

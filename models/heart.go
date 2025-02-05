@@ -5,7 +5,6 @@ import (
 )
 
 type Heart struct {
-	ENC         string `json:"enc"`
 	SHA_encrypt string `json:"sha_encrypt"`
 	Id_encrypt  string `json:"id_encrypt"`
 	Song_id     string `json:"song_id"`
