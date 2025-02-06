@@ -469,8 +469,8 @@ func VerifyReturnHeart(c *gin.Context) {
 	returnHeartClaim := models.MatchTable{
 		Roll1:  userID.(string),
 		Roll2:  heartClaim.Roll,
-		SONG12: heartModel.SONG_ENC,
-		SONG21: heartClaim.SONG_ENC,
+		SONG12: heartClaim.SONG_ENC,
+		SONG21: heartModel.SONG_ENC,
 	}
 	if err := Db.Create(&returnHeartClaim).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
