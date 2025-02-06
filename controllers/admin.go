@@ -1,9 +1,9 @@
 package controllers
 
 import (
+	"encoding/json"
 	"net/http"
 	"os"
-	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -69,6 +69,7 @@ func AddNewUser(c *gin.Context) {
 	// Create user
 	for _, user := range info.TypeUserNew {
 
+		emptyMatches, _ := json.Marshal(make(map[string]string))
 		newUser := models.User{
 			Id:        user.Id,
 			Name:      user.Name,
@@ -80,7 +81,7 @@ func AddNewUser(c *gin.Context) {
 			AuthC:     utils.RandStringRunes(15),
 			Data:      "",
 			Submit:    false,
-			Matches:   "",
+			Matches:   emptyMatches,
 			Dirty:     false,
 			Publish:   false,
 			Code:      "",
@@ -142,54 +143,63 @@ func PublishResults(c *gin.Context) {
 	if !models.PublishMatches {
 		var matchdb models.MatchTable
 		var matches []models.MatchTable
-		records := Db.Model(&matchdb).Where("").Find(&matches)
+		records := Db.Model(&matchdb).Find(&matches)
 		if records.Error != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Some error occured while calculating matches"})
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Some error occurred while calculating matches"})
 			return
 		}
-		matchesMap := make(map[string][]string)
+
 		for _, match := range matches {
 			roll1 := match.Roll1
 			roll2 := match.Roll2
+			song12 := match.SONG12 // Song sent by roll2 to roll1
+			song21 := match.SONG21 // Song sent by roll1 to roll2
+
 			var userdb models.User
 			var userdb1 models.User
-			record := Db.Model(&userdb).Where("id = ?", roll1).First(&userdb)
-			if record.Error != nil {
-				c.JSON(http.StatusInternalServerError, gin.H{"error": "Error occured while connecting to db"})
+
+			// Fetch user1
+			if err := Db.Model(&userdb).Where("id = ?", roll1).First(&userdb).Error; err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "Error occurred while fetching user1"})
 				return
 			}
-			record = Db.Model(&userdb1).Where("id = ?", roll2).First(&userdb1)
-			if record.Error != nil {
-				c.JSON(http.StatusInternalServerError, gin.H{"error": "Error occured while connecting to db"})
+
+			// Fetch user2
+			if err := Db.Model(&userdb1).Where("id = ?", roll2).First(&userdb1).Error; err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "Error occurred while fetching user2"})
 				return
 			}
+
+			// Only proceed if both users have opted to publish their results
 			if userdb.Publish && userdb1.Publish {
-				matchesMap[roll1] = append(matchesMap[roll1], roll2)
-				matchesMap[roll2] = append(matchesMap[roll2], roll1)
+				// Unmarshal existing matches
+				var matches1, matches2 map[string]string
+				if len(userdb.Matches) > 0 {
+					_ = json.Unmarshal(userdb.Matches, &matches1)
+				} else {
+					matches1 = make(map[string]string)
+				}
+
+				if len(userdb1.Matches) > 0 {
+					_ = json.Unmarshal(userdb1.Matches, &matches2)
+				} else {
+					matches2 = make(map[string]string)
+				}
+
+				// Add new matches
+				matches1[roll2] = song21
+				matches2[roll1] = song12
+
+				// Marshal back into json.RawMessage
+				userdb.Matches, _ = json.Marshal(matches1)
+				userdb1.Matches, _ = json.Marshal(matches2)
+
+				// Save the updated user records
+				Db.Save(&userdb)
+				Db.Save(&userdb1)
 			}
 		}
-		for key := range matchesMap {
-			var userdb models.User
-			record := Db.Model(&userdb).Where("id = ?", key).First(&userdb)
-			if record.Error != nil {
-				c.JSON(http.StatusInternalServerError, gin.H{"error": "Error updating matches of " + key})
-				return
-			}
-			tempMap := make(map[string]bool)
-			for _, match := range matchesMap[key] {
-				tempMap[match] = true
-			}
-			results := []string{}
-			for key := range tempMap {
-				results = append(results, key)
-			}
-			userdb.Matches = strings.Join(results, ",")
-			record = Db.Save(&userdb)
-			if record.Error != nil {
-				c.JSON(http.StatusInternalServerError, gin.H{"error": "Error updating matches of " + key})
-				return
-			}
-		}
+
 		models.PublishMatches = true
 		c.JSON(http.StatusOK, gin.H{"msg": "Published Matches"})
 		return

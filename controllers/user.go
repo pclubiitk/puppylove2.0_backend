@@ -5,14 +5,14 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"net/http"
-	"net/url"
-	"strings"
-	"time"
 	"github.com/gin-gonic/gin"
 	"github.com/pclubiitk/puppylove2.0_backend/models"
 	"github.com/pclubiitk/puppylove2.0_backend/redisclient"
 	"gorm.io/gorm"
+	"net/http"
+	"net/url"
+	// "strings"
+	"time"
 )
 
 func UserFirstLogin(c *gin.Context) {
@@ -110,6 +110,7 @@ func SendHeart(c *gin.Context) {
 		newheart1 := models.SendHeart{
 			SHA:            info.SHA1,
 			ENC:            info.ENC1,
+			SONG_ENC:       info.SONG1,
 			GenderOfSender: info.GenderOfSender,
 		}
 		if err := Db.Create(&newheart1).Error; err != nil {
@@ -129,6 +130,7 @@ func SendHeart(c *gin.Context) {
 		newheart2 := models.SendHeart{
 			SHA:            info.SHA2,
 			ENC:            info.ENC2,
+			SONG_ENC:       info.SONG2,
 			GenderOfSender: info.GenderOfSender,
 		}
 		if err := Db.Create(&newheart2).Error; err != nil {
@@ -141,6 +143,7 @@ func SendHeart(c *gin.Context) {
 		newheart3 := models.SendHeart{
 			SHA:            info.SHA3,
 			ENC:            info.ENC3,
+			SONG_ENC:       info.SONG3,
 			GenderOfSender: info.GenderOfSender,
 		}
 		if err := Db.Create(&newheart3).Error; err != nil {
@@ -153,6 +156,7 @@ func SendHeart(c *gin.Context) {
 		newheart4 := models.SendHeart{
 			SHA:            info.SHA4,
 			ENC:            info.ENC4,
+			SONG_ENC:       info.SONG4,
 			GenderOfSender: info.GenderOfSender,
 		}
 		if err := Db.Create(&newheart4).Error; err != nil {
@@ -164,8 +168,9 @@ func SendHeart(c *gin.Context) {
 	for _, heart := range info.ReturnHearts {
 		enc := heart.Enc
 		sha := heart.SHA
+		song := heart.SONG_ENC
 
-		if err := ReturnClaimedHeart(enc, sha, userID.(string)); err != nil {
+		if err := ReturnClaimedHeart(enc, sha, song, userID.(string)); err != nil {
 			c.JSON(http.StatusAccepted, gin.H{"message": "Hearts Sent Successfully !!, but found invalid Claim Requests. It will be recorded"})
 			return
 		}
@@ -238,7 +243,7 @@ func (e HeartClaimError) Error() string {
 	return e.Message
 }
 
-func ReturnClaimedHeart(enc string, sha string, userId string) error {
+func ReturnClaimedHeart(enc string, sha string, song string, userId string) error {
 	heartModel := models.HeartClaims{}
 	if enc == "" || sha == "" {
 		return nil
@@ -253,8 +258,9 @@ func ReturnClaimedHeart(enc string, sha string, userId string) error {
 	}
 
 	heartclaim := models.ReturnHearts{
-		SHA: sha,
-		ENC: enc,
+		SHA:      sha,
+		ENC:      enc,
+		SONG_ENC: song,
 	}
 	if err := Db.Create(&heartclaim).Error; err != nil {
 		return HeartClaimError{Message: "Something Unexpected Occurred while adding the heart claim."}
@@ -291,9 +297,10 @@ func HeartClaim(c *gin.Context) {
 
 	userID, _ := c.Get("user_id")
 	heartclaim := models.HeartClaims{
-		Id:   info.Enc,
-		SHA:  info.SHA,
-		Roll: userID.(string),
+		Id:       info.Enc,
+		SHA:      info.SHA,
+		Roll:     userID.(string),
+		SONG_ENC: heartModel.SONG_ENC,
 	}
 	if err := Db.Create(&heartclaim).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
@@ -350,7 +357,8 @@ func ReturnClaimedHeartLate(c *gin.Context) {
 	for _, heart := range info.ReturnHearts {
 		enc := heart.ENC
 		sha := heart.SHA
-		if err := ReturnClaimedHeart(enc, sha, userID.(string)); err != nil {
+		song := heart.SONG_ENC
+		if err := ReturnClaimedHeart(enc, sha, song, userID.(string)); err != nil {
 			c.JSON(http.StatusAccepted, gin.H{"message": "Found invalid Claim Requests. It will be recorded"})
 			return
 		}
@@ -452,9 +460,17 @@ func VerifyReturnHeart(c *gin.Context) {
 	// 	}
 	// }
 
+	var existingMatch models.MatchTable
+	if err := Db.Where("roll1 = ? AND roll2 = ?", heartClaim.Roll, userID.(string)).First(&existingMatch).Error; err == nil {
+		// Entry already exists, so return without inserting
+		c.JSON(http.StatusAccepted, gin.H{"message": "Match Already Done from other side"})
+		return
+	}
 	returnHeartClaim := models.MatchTable{
-		Roll1: userID.(string),
-		Roll2: heartClaim.Roll,
+		Roll1:  userID.(string),
+		Roll2:  heartClaim.Roll,
+		SONG12: heartModel.SONG_ENC,
+		SONG21: heartClaim.SONG_ENC,
 	}
 	if err := Db.Create(&returnHeartClaim).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
@@ -466,31 +482,30 @@ func VerifyReturnHeart(c *gin.Context) {
 
 func MatchesHandler(c *gin.Context) {
 	if models.PublishMatches {
-
-		// resultsmap := make(map[string]bool)
 		userID, _ := c.Get("user_id")
 		var user models.User
 
-		Db.Model(&user).Where("id=?", userID).First(&user)
-
-		if !user.Publish {
-			c.JSON(http.StatusOK, gin.H{"msg": "You choose not to publish results"})
+		if err := Db.Model(&user).Where("id = ?", userID).First(&user).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "User not found"})
 			return
 		}
 
-		matches := strings.Split(user.Matches, ",")
+		if !user.Publish {
+			c.JSON(http.StatusOK, gin.H{"msg": "You chose not to publish results"})
+			return
+		}
 
-		// for _, match := range matches {
-		// 	resultsmap[match] = true
-		// }
-		// results := []string{}
-		// for key := range resultsmap {
-		// 	results = append(results, key)
-		// }
+		// Unmarshal Matches field for response
+		var matches map[string]string
+		if len(user.Matches) > 0 {
+			_ = json.Unmarshal(user.Matches, &matches)
+		} else {
+			matches = make(map[string]string)
+		}
+
 		c.JSON(http.StatusOK, gin.H{"matches": matches})
 		return
-
 	}
+
 	c.JSON(http.StatusOK, gin.H{"msg": "Matches not yet published"})
 }
-

@@ -7,7 +7,7 @@ import (
 type Heart struct {
 	SHA_encrypt string `json:"sha_encrypt"`
 	Id_encrypt  string `json:"id_encrypt"`
-	Song_id     string `json:"song_id"`
+	SongID_enc  string `json:"songID_enc"`
 }
 
 type Hearts struct {
@@ -22,25 +22,26 @@ type SendHeartVirtual struct {
 }
 
 type SendHeartFirst struct {
-	GenderOfSender string `json:"genderOfSender" binding:"required"`
-	ENC1           string `json:"enc1" binding:"required"`
-	SHA1           string `json:"sha1" binding:"required"`
-	// SONG1          string             `json:"song1"`
-	ENC2 string `json:"enc2"`
-	SHA2 string `json:"sha2"`
-	//	SONG2          string             `json:"song2"`
-	ENC3 string `json:"enc3"`
-	SHA3 string `json:"sha3"`
-	//	SONG3          string             `json:"song3"`
-	ENC4 string `json:"enc4"`
-	SHA4 string `json:"sha4"`
-	//	SONG4          string             `json:"song4"`
-	ReturnHearts []VerifyHeartClaim `json:"returnhearts"`
+	GenderOfSender string             `json:"genderOfSender" binding:"required"`
+	ENC1           string             `json:"enc1" binding:"required"`
+	SHA1           string             `json:"sha1" binding:"required"`
+	SONG1          string             `json:"song1_enc"`
+	ENC2           string             `json:"enc2"`
+	SHA2           string             `json:"sha2"`
+	SONG2          string             `json:"song2_enc"`
+	ENC3           string             `json:"enc3"`
+	SHA3           string             `json:"sha3"`
+	SONG3          string             `json:"song3_enc"`
+	ENC4           string             `json:"enc4"`
+	SHA4           string             `json:"sha4"`
+	SONG4          string             `json:"song4_enc"`
+	ReturnHearts   []VerifyHeartClaim `json:"returnhearts"`
 }
 
 type VerifyHeartClaim struct {
 	Enc            string `json:"enc" binding:"required"`
 	SHA            string `json:"sha" binding:"required"`
+	SONG_ENC       string `json:"songID_enc" bson:"song"`
 	GenderOfSender string `json:"genderOfSender" binding:"required"`
 }
 
@@ -65,9 +66,9 @@ type SentHeartsDecoded struct {
 type (
 	SendHeart struct {
 		gorm.Model
-		SHA string `json:"sha" bson:"sha" gorm:"unique"`
-		ENC string `json:"enc" bson:"enc" gorm:"unique"`
-		//	SONG           string `json:"song" bson:"song"`
+		SHA            string `json:"sha" bson:"sha" gorm:"unique"`
+		ENC            string `json:"enc" bson:"enc" gorm:"unique"`
+		SONG_ENC       string `json:"songID_enc" bson:"song"`
 		GenderOfSender string `json:"genderOfSender" bson:"gender"`
 	}
 )
@@ -75,9 +76,10 @@ type (
 type (
 	HeartClaims struct {
 		gorm.Model
-		Id   string `json:"enc" bson:"enc" gorm:"unique"`
-		SHA  string `json:"sha" bson:"sha" gorm:"unique"`
-		Roll string `json:"roll"`
+		Id       string `json:"enc" bson:"enc" gorm:"unique"`
+		SHA      string `json:"sha" bson:"sha" gorm:"unique"`
+		Roll     string `json:"roll"`
+		SONG_ENC string `json:"songID_enc" bson:"song"`
 	}
 )
 
@@ -88,15 +90,17 @@ type UserReturnHearts struct {
 }
 
 type UserReturnHeart struct {
-	ENC string `json:"enc" binding:"required" gorm:"unique"`
-	SHA string `json:"sha" binding:"required" gorm:"unique"`
+	ENC      string `json:"enc" binding:"required" gorm:"unique"`
+	SHA      string `json:"sha" binding:"required" gorm:"unique"`
+	SONG_ENC string `json:"songID_enc" bson:"song"`
 }
 
 type (
 	ReturnHearts struct {
 		gorm.Model
-		SHA string `json:"sha" bson:"sha"`
-		ENC string `json:"enc" bson:"enc" gorm:"unique"`
+		SHA      string `json:"sha" bson:"sha"`
+		ENC      string `json:"enc" bson:"enc" gorm:"unique"`
+		SONG_ENC string `json:"songID_enc" bson:"song"`
 	}
 )
 
@@ -107,7 +111,9 @@ type FetchReturnHeart struct {
 type (
 	MatchTable struct {
 		gorm.Model
-		Roll1 string `json:"roll1" bson:"roll1"`
-		Roll2 string `json:"roll2" bson:"roll2"`
+		Roll1  string `json:"roll1" bson:"roll1"`
+		Roll2  string `json:"roll2" bson:"roll2"`
+		SONG12 string `bson:"song12"`
+		SONG21 string `bson:"song21"`
 	}
 )

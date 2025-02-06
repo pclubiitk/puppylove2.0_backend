@@ -10,7 +10,7 @@ import (
 	"github.com/pclubiitk/puppylove2.0_backend/utils"
 	"gorm.io/gorm"
 	"net/http"
-	"strings"
+	// "strings"
 	"time"
 )
 
@@ -205,53 +205,53 @@ func UserMail(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Auth. code sent successfully !!"})
 }
 
-func GetStats(c *gin.Context) {
-	if !models.PublishMatches {
-		c.JSON(http.StatusOK, gin.H{"msg": "Stats Not yet published"})
-		return
-	}
-	if models.StatsFlag {
-		models.StatsFlag = false
-		var userdb models.User
-		var users []models.User
-
-		records := Db.Model(&userdb).Where("dirty = ?", true).Find(&users)
-		if records.Error != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Error Fetching Stats"})
-			return
-		}
-
-		for _, user := range users {
-			// log.Print(user.Id)
-			if len(user.Id) >= 2 && user.Dirty {
-				if user.Gender == "M" {
-					models.MaleRegisters++
-				} else {
-					models.FemaleRegisters++
-				}
-				models.RegisterMap["y"+user.Id[0:2]]++
-				if user.Matches == "" {
-					continue
-				}
-				var matchCount = len(strings.Split(user.Matches, ","))
-				if matchCount != 0 {
-					models.NumberOfMatches += matchCount
-					var myMatches = strings.Split(user.Matches, ",")
-					for _, t := range myMatches {
-						if len(t) >= 2 {
-							models.MatchMap["y"+t[0:2]]++
-						}
-					}
-				}
-			}
-			// log.Print("Done")
-		}
-	}
-	c.JSON(http.StatusOK, gin.H{
-		"totalRegisters":        models.MaleRegisters + models.FemaleRegisters,
-		"femaleRegisters":       models.FemaleRegisters,
-		"maleRegisters":         models.MaleRegisters,
-		"batchwiseRegistration": models.RegisterMap,
-		"totalMatches":          models.NumberOfMatches,
-		"batchwiseMatches":      models.MatchMap})
-}
+// func GetStats(c *gin.Context) {
+// 	if !models.PublishMatches {
+// 		c.JSON(http.StatusOK, gin.H{"msg": "Stats Not yet published"})
+// 		return
+// 	}
+// 	if models.StatsFlag {
+// 		models.StatsFlag = false
+// 		var userdb models.User
+// 		var users []models.User
+//
+// 		records := Db.Model(&userdb).Where("dirty = ?", true).Find(&users)
+// 		if records.Error != nil {
+// 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Error Fetching Stats"})
+// 			return
+// 		}
+//
+// 		for _, user := range users {
+// 			// log.Print(user.Id)
+// 			if len(user.Id) >= 2 && user.Dirty {
+// 				if user.Gender == "M" {
+// 					models.MaleRegisters++
+// 				} else {
+// 					models.FemaleRegisters++
+// 				}
+// 				models.RegisterMap["y"+user.Id[0:2]]++
+// 				if user.Matches == "" {
+// 					continue
+// 				}
+// 				var matchCount = len(strings.Split(user.Matches, ","))
+// 				if matchCount != 0 {
+// 					models.NumberOfMatches += matchCount
+// 					var myMatches = strings.Split(user.Matches, ",")
+// 					for _, t := range myMatches {
+// 						if len(t) >= 2 {
+// 							models.MatchMap["y"+t[0:2]]++
+// 						}
+// 					}
+// 				}
+// 			}
+// 			// log.Print("Done")
+// 		}
+// 	}
+// 	c.JSON(http.StatusOK, gin.H{
+// 		"totalRegisters":        models.MaleRegisters + models.FemaleRegisters,
+// 		"femaleRegisters":       models.FemaleRegisters,
+// 		"maleRegisters":         models.MaleRegisters,
+// 		"batchwiseRegistration": models.RegisterMap,
+// 		"totalMatches":          models.NumberOfMatches,
+// 		"batchwiseMatches":      models.MatchMap})
+// }
