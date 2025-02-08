@@ -85,6 +85,6 @@ func PuppyRoute(r *gin.Engine, db db.PuppyDb) {
 		admin.GET("/publish", controllers.PublishResults)
 		admin.GET("/TogglePermit", controllers.TogglePermit)
 	}
-	// r.GET("/stats", controllers.GetStats)
+	r.GET("/stats", controllers.GetStats)
 
 }

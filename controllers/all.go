@@ -1,15 +1,19 @@
 package controllers
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/pclubiitk/puppylove2.0_backend/mail"
 	"github.com/pclubiitk/puppylove2.0_backend/models"
 	"github.com/pclubiitk/puppylove2.0_backend/redisclient"
 	"github.com/pclubiitk/puppylove2.0_backend/utils"
 	"gorm.io/gorm"
-	"net/http"
+
 	// "strings"
 	"time"
 )
@@ -205,53 +209,59 @@ func UserMail(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Auth. code sent successfully !!"})
 }
 
-// func GetStats(c *gin.Context) {
-// 	if !models.PublishMatches {
-// 		c.JSON(http.StatusOK, gin.H{"msg": "Stats Not yet published"})
-// 		return
-// 	}
-// 	if models.StatsFlag {
-// 		models.StatsFlag = false
-// 		var userdb models.User
-// 		var users []models.User
-//
-// 		records := Db.Model(&userdb).Where("dirty = ?", true).Find(&users)
-// 		if records.Error != nil {
-// 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Error Fetching Stats"})
-// 			return
-// 		}
-//
-// 		for _, user := range users {
-// 			// log.Print(user.Id)
-// 			if len(user.Id) >= 2 && user.Dirty {
-// 				if user.Gender == "M" {
-// 					models.MaleRegisters++
-// 				} else {
-// 					models.FemaleRegisters++
-// 				}
-// 				models.RegisterMap["y"+user.Id[0:2]]++
-// 				if user.Matches == "" {
-// 					continue
-// 				}
-// 				var matchCount = len(strings.Split(user.Matches, ","))
-// 				if matchCount != 0 {
-// 					models.NumberOfMatches += matchCount
-// 					var myMatches = strings.Split(user.Matches, ",")
-// 					for _, t := range myMatches {
-// 						if len(t) >= 2 {
-// 							models.MatchMap["y"+t[0:2]]++
-// 						}
-// 					}
-// 				}
-// 			}
-// 			// log.Print("Done")
-// 		}
-// 	}
-// 	c.JSON(http.StatusOK, gin.H{
-// 		"totalRegisters":        models.MaleRegisters + models.FemaleRegisters,
-// 		"femaleRegisters":       models.FemaleRegisters,
-// 		"maleRegisters":         models.MaleRegisters,
-// 		"batchwiseRegistration": models.RegisterMap,
-// 		"totalMatches":          models.NumberOfMatches,
-// 		"batchwiseMatches":      models.MatchMap})
-// }
+func GetStats(c *gin.Context) {
+	if !models.PublishMatches {
+		c.JSON(http.StatusOK, gin.H{"msg": "Stats Not yet published"})
+		return
+	}
+	if models.StatsFlag {
+		models.StatsFlag = false
+		var userdb models.User
+		var users []models.User
+
+		records := Db.Model(&userdb).Where("dirty = ?", true).Find(&users)
+		if records.Error != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Error Fetching Stats"})
+			return
+		}
+
+		for _, user := range users {
+			if len(user.Id) >= 2 && user.Dirty {
+				if user.Gender == "M" {
+					models.MaleRegisters++
+				} else {
+					models.FemaleRegisters++
+				}
+				models.RegisterMap["y"+user.Id[0:2]]++
+
+				if string(user.Matches) == "" {
+					continue
+				}
+				var matchMap map[string]string
+				err := json.Unmarshal([]byte(user.Matches), &matchMap)
+				if err != nil {
+					log.Print("Error parsing matches JSON: ", err)
+					continue
+				}
+				matchCount := len(matchMap)
+
+				if matchCount != 0 {
+					models.NumberOfMatches += matchCount
+					for matchID := range matchMap {
+						if len(matchID) >= 2 {
+							batchYear := "y" + matchID[0:2]
+							models.MatchMap[batchYear]++
+						}
+					}
+				}
+			}
+		}
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"totalRegisters":        models.MaleRegisters + models.FemaleRegisters,
+		"femaleRegisters":       models.FemaleRegisters,
+		"maleRegisters":         models.MaleRegisters,
+		"batchwiseRegistration": models.RegisterMap,
+		"totalMatches":          models.NumberOfMatches,
+		"batchwiseMatches":      models.MatchMap})
+}
