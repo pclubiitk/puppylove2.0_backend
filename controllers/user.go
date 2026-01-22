@@ -5,15 +5,24 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net/http"
+	"net/url"
+	"sync"
+
 	"github.com/gin-gonic/gin"
 	"github.com/pclubiitk/puppylove2.0_backend/models"
 	"github.com/pclubiitk/puppylove2.0_backend/redisclient"
 	"gorm.io/gorm"
-	"net/http"
-	"net/url"
+
 	// "strings"
 	"time"
 )
+
+// Mutexes, apparently optional for postgreSQL, mostly kept for safety
+// there's a neglibile performance overhead in using mutexes, single mutex
+// for both VerifyHeartReturns and HeartClaim since interaction with same
+// table
+var heartOperationsMutex sync.Mutex
 
 func UserFirstLogin(c *gin.Context) {
 	// User already authenticated in router.go by gin.HandlerFunc
@@ -277,33 +286,45 @@ func HeartClaim(c *gin.Context) {
 		return
 	}
 
+	userID, _ := c.Get("user_id")
 	claim_status := "true"
-	heartModel := models.SendHeart{}
-	verifyheart := Db.Model(&heartModel).Where("sha = ? AND enc = ?", info.SHA, info.Enc).First(&heartModel)
-	if verifyheart.Error != nil {
-		if errors.Is(verifyheart.Error, gorm.ErrRecordNotFound) {
-			// c.JSON(http.StatusForbidden, gin.H{"error": "Invalid Heart Claim Request."})
+	var songEnc string
+
+	heartOperationsMutex.Lock()
+	defer heartOperationsMutex.Unlock()
+
+	// Use a transaction to make find+delete+create atomic to avoid race conditions
+	err := Db.Transaction(func(tx *gorm.DB) error {
+		heartModel := models.SendHeart{}
+		if err := tx.Where("sha = ? AND enc = ?", info.SHA, info.Enc).First(&heartModel).Error; err != nil {
+			return err
+		}
+		songEnc = heartModel.SONG_ENC
+
+		if err := tx.Where("sha = ? AND enc = ?", info.SHA, info.Enc).Unscoped().Delete(&heartModel).Error; err != nil {
+			return err
+		}
+
+		heartclaim := models.HeartClaims{
+			Id:       info.Enc,
+			SHA:      info.SHA,
+			Roll:     userID.(string),
+			SONG_ENC: songEnc,
+		}
+
+		if err := tx.Create(&heartclaim).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			claim_status = "false"
 		} else {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": verifyheart.Error.Error()})
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		}
-		return
-	}
-	// If the db has record of sha and enc then remove it from the record and add the sha, enc to userId
-	if err := Db.Model(&heartModel).Where("sha = ? AND enc = ?", info.SHA, info.Enc).Unscoped().Delete(&heartModel).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-
-	userID, _ := c.Get("user_id")
-	heartclaim := models.HeartClaims{
-		Id:       info.Enc,
-		SHA:      info.SHA,
-		Roll:     userID.(string),
-		SONG_ENC: heartModel.SONG_ENC,
-	}
-	if err := Db.Create(&heartclaim).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
 		return
 	}
 
@@ -407,75 +428,70 @@ func VerifyReturnHeart(c *gin.Context) {
 	h.Write([]byte(info.Secret))
 	bs := h.Sum(nil)
 	hash := fmt.Sprintf("%x", bs)
-	heartModel := models.ReturnHearts{}
-	verifyheart := Db.Model(&heartModel).Where("sha = ? AND enc = ?", hash, info.Enc).First(&heartModel)
-	if verifyheart.Error != nil {
-		if errors.Is(verifyheart.Error, gorm.ErrRecordNotFound) {
+
+	userID, _ := c.Get("user_id")
+	var heartClaimSongEnc string
+	var heartModelSongEnc string
+	var heartClaimRoll string
+
+	heartOperationsMutex.Lock()
+	defer heartOperationsMutex.Unlock()
+
+	// Use a transaction to make find+delete+create atomic to avoid race conditions
+	err := Db.Transaction(func(tx *gorm.DB) error {
+		heartModel := models.ReturnHearts{}
+		if err := tx.Where("sha = ? AND enc = ?", hash, info.Enc).First(&heartModel).Error; err != nil {
+			return err
+		}
+		heartModelSongEnc = heartModel.SONG_ENC
+
+		if err := tx.Where("sha = ? AND enc = ?", hash, info.Enc).Unscoped().Delete(&heartModel).Error; err != nil {
+			return err
+		}
+
+		var heartClaim models.HeartClaims
+		if err := tx.Where("sha = ?", hash).First(&heartClaim).Error; err != nil {
+			return err
+		}
+
+		heartClaimSongEnc = heartClaim.SONG_ENC
+		heartClaimRoll = heartClaim.Roll
+
+		var existingMatch models.MatchTable
+		if err := tx.Where("roll1 = ? AND roll2 = ?", heartClaim.Roll, userID.(string)).First(&existingMatch).Error; err == nil {
+			return errors.New("MATCH_EXISTS")
+		}
+
+		returnHeartClaim := models.MatchTable{
+			Roll1:  userID.(string),
+			Roll2:  heartClaim.Roll,
+			SONG12: heartClaim.SONG_ENC,
+			SONG21: heartModel.SONG_ENC,
+		}
+		if err := tx.Create(&returnHeartClaim).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		if err.Error() == "MATCH_EXISTS" {
+			c.JSON(http.StatusAccepted, gin.H{"message": "Match Already Done from other side"})
+			return
+		}
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			c.JSON(http.StatusForbidden, gin.H{"error": "Invalid Heart Claim Request."})
 		} else {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": verifyheart.Error.Error()})
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		}
 		return
 	}
-	if err := Db.Model(&heartModel).Where("sha = ? AND enc = ?", hash, info.Enc).Unscoped().Delete(&heartModel).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-	var heartClaim models.HeartClaims
-	Db.Model(heartClaim).Where("sha = ?", hash).First(&heartClaim)
-	userID, _ := c.Get("user_id")
-	// roll1 := userID.(string)
-	// roll2 := heartClaim.Roll
 
-	// userdb := models.User{}
-	// Db.Model(&userdb).Where("id = ?", roll1).First(&userdb)
-	// userdb.Matches = userdb.Matches + "," + roll2
-	// Db.Save(&userdb)
-
-	// userdb2 := models.User{}
-	// Db.Model(&userdb2).Where("id = ?", roll2).First(&userdb2)
-	// userdb2.Matches = userdb2.Matches + "," + roll1
-	// Db.Save(&userdb2)
-
-	// temp1, _ := strconv.Atoi(userID.(string))
-	// temp2, _ := strconv.Atoi(heartClaim.Roll)
-
-	// if temp1 < temp2 {
-	// 	returnHeartClaim := models.MatchTable{
-	// 		Roll1: userID.(string),
-	// 		Roll2: heartClaim.Roll,
-	// 	}
-	// 	if err := Db.Create(&returnHeartClaim).Error; err != nil {
-	// 		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
-	// 		return
-	// 	}
-	// } else if temp2 < temp1 {
-	// 	returnHeartClaim := models.MatchTable{
-	// 		Roll2: userID.(string),
-	// 		Roll1: heartClaim.Roll,
-	// 	}
-	// 	if err := Db.Create(&returnHeartClaim).Error; err != nil {
-	// 		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
-	// 		return
-	// 	}
-	// }
-
-	var existingMatch models.MatchTable
-	if err := Db.Where("roll1 = ? AND roll2 = ?", heartClaim.Roll, userID.(string)).First(&existingMatch).Error; err == nil {
-		// Entry already exists, so return without inserting
-		c.JSON(http.StatusAccepted, gin.H{"message": "Match Already Done from other side"})
-		return
-	}
-	returnHeartClaim := models.MatchTable{
-		Roll1:  userID.(string),
-		Roll2:  heartClaim.Roll,
-		SONG12: heartClaim.SONG_ENC,
-		SONG21: heartModel.SONG_ENC,
-	}
-	if err := Db.Create(&returnHeartClaim).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
-		return
-	}
+	// not sure why this is required
+	_ = heartClaimSongEnc
+	_ = heartModelSongEnc
+	_ = heartClaimRoll
 
 	c.JSON(http.StatusAccepted, gin.H{"message": "Heart Claim Success"})
 }
