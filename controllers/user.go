@@ -5,15 +5,21 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net/http"
+	"net/url"
+	"sync"
+
 	"github.com/gin-gonic/gin"
 	"github.com/pclubiitk/puppylove2.0_backend/models"
 	"github.com/pclubiitk/puppylove2.0_backend/redisclient"
 	"gorm.io/gorm"
-	"net/http"
-	"net/url"
+
 	// "strings"
 	"time"
 )
+
+// Mutex to serialize HeartClaim operations (apparently optional for postgreSQL, mostly kept for safety)
+var heartClaimMutex sync.Mutex
 
 func UserFirstLogin(c *gin.Context) {
 	// User already authenticated in router.go by gin.HandlerFunc
@@ -277,33 +283,45 @@ func HeartClaim(c *gin.Context) {
 		return
 	}
 
+	userID, _ := c.Get("user_id")
 	claim_status := "true"
-	heartModel := models.SendHeart{}
-	verifyheart := Db.Model(&heartModel).Where("sha = ? AND enc = ?", info.SHA, info.Enc).First(&heartModel)
-	if verifyheart.Error != nil {
-		if errors.Is(verifyheart.Error, gorm.ErrRecordNotFound) {
-			// c.JSON(http.StatusForbidden, gin.H{"error": "Invalid Heart Claim Request."})
+	var songEnc string
+
+	heartClaimMutex.Lock()
+	defer heartClaimMutex.Unlock()
+
+	// Use a transaction to make find+delete+create atomic to avoid race conditions
+	err := Db.Transaction(func(tx *gorm.DB) error {
+		heartModel := models.SendHeart{}
+		if err := tx.Where("sha = ? AND enc = ?", info.SHA, info.Enc).First(&heartModel).Error; err != nil {
+			return err
+		}
+		songEnc = heartModel.SONG_ENC
+
+		if err := tx.Where("sha = ? AND enc = ?", info.SHA, info.Enc).Unscoped().Delete(&heartModel).Error; err != nil {
+			return err
+		}
+
+		heartclaim := models.HeartClaims{
+			Id:       info.Enc,
+			SHA:      info.SHA,
+			Roll:     userID.(string),
+			SONG_ENC: songEnc,
+		}
+
+		if err := tx.Create(&heartclaim).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			claim_status = "false"
 		} else {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": verifyheart.Error.Error()})
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		}
-		return
-	}
-	// If the db has record of sha and enc then remove it from the record and add the sha, enc to userId
-	if err := Db.Model(&heartModel).Where("sha = ? AND enc = ?", info.SHA, info.Enc).Unscoped().Delete(&heartModel).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-
-	userID, _ := c.Get("user_id")
-	heartclaim := models.HeartClaims{
-		Id:       info.Enc,
-		SHA:      info.SHA,
-		Roll:     userID.(string),
-		SONG_ENC: heartModel.SONG_ENC,
-	}
-	if err := Db.Create(&heartclaim).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
 		return
 	}
 
