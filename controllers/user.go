@@ -19,9 +19,10 @@ import (
 )
 
 // Mutexes, apparently optional for postgreSQL, mostly kept for safety
-// there's a neglibile performance overhead in using mutexes
-var heartClaimMutex sync.Mutex
-var verifyReturnHeartMutex sync.Mutex
+// there's a neglibile performance overhead in using mutexes, single mutex
+// for both VerifyHeartReturns and HeartClaim since interaction with same
+// table
+var heartOperationsMutex sync.Mutex
 
 func UserFirstLogin(c *gin.Context) {
 	// User already authenticated in router.go by gin.HandlerFunc
@@ -289,8 +290,8 @@ func HeartClaim(c *gin.Context) {
 	claim_status := "true"
 	var songEnc string
 
-	heartClaimMutex.Lock()
-	defer heartClaimMutex.Unlock()
+	heartOperationsMutex.Lock()
+	defer heartOperationsMutex.Unlock()
 
 	// Use a transaction to make find+delete+create atomic to avoid race conditions
 	err := Db.Transaction(func(tx *gorm.DB) error {
@@ -433,8 +434,8 @@ func VerifyReturnHeart(c *gin.Context) {
 	var heartModelSongEnc string
 	var heartClaimRoll string
 
-	verifyReturnHeartMutex.Lock()
-	defer verifyReturnHeartMutex.Unlock()
+	heartOperationsMutex.Lock()
+	defer heartOperationsMutex.Unlock()
 
 	// Use a transaction to make find+delete+create atomic to avoid race conditions
 	err := Db.Transaction(func(tx *gorm.DB) error {
